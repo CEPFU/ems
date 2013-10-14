@@ -5,13 +5,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+
+/**
+ * Loader for files via URL.
+ * @author Ralf Oechsner
+ *
+ */
 public class URLLoader implements ILoader {
 
 	private String text;
 	private URL url;
 	
 	/**
-	 * Loader for HTTP.
+	 * Loader for any file that can be loaded with an URL (e.g. via HTTP).
 	 * @param url URL of file to load.
 	 */
 	public URLLoader(URL url) {

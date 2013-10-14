@@ -59,6 +59,8 @@ public class CSVImporterTest {
 		for (int i = 0; i < this.testEvents.size(); i++) {
 			
 			assertTrue(this.testEvents.get(i).toString().equals(importer.getEvents().get(i).toString()));
+			// TODO: make it work
+//			assertTrue(this.testEvents.get(i).equals(importer.getEvents().get(i)));
 		}
 	}
 	
