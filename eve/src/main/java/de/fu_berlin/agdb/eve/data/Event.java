@@ -115,7 +115,7 @@ public class Event implements IEvent {
 		} else if (!timeStamp.equals(other.timeStamp))
 			return false;
 		return true;
-	}
+	}	
 	
 	
 }

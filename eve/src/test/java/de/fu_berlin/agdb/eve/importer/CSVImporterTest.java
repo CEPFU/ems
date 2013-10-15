@@ -21,6 +21,7 @@ import de.fu_berlin.agdb.eve.data.Event;
 import de.fu_berlin.agdb.eve.data.IAttribute;
 
 /**
+ * Test for the CSVImporter.
  * @author Ralf Oechsner
  *
  */
@@ -57,10 +58,8 @@ public class CSVImporterTest {
 	private void compare(IImporter importer) {
 		
 		for (int i = 0; i < this.testEvents.size(); i++) {
-			
-			assertTrue(this.testEvents.get(i).toString().equals(importer.getEvents().get(i).toString()));
-			// TODO: make it work
-//			assertTrue(this.testEvents.get(i).equals(importer.getEvents().get(i)));
+
+			assertTrue(this.testEvents.get(i).equals(importer.getEvents().get(i)));
 		}
 	}
 	
