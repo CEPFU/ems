@@ -99,6 +99,10 @@ public class RSSImporter implements IImporter {
 		// every node is added as an attribute
 		for (int i = 0; i < nodes.getLength(); i++) {
 			
+			// skip text nodes
+			if (nodes.item(i).getNodeType() == Node.TEXT_NODE)
+				continue;
+			
 			String tag = nodes.item(i).getNodeName();
 			String text = nodes.item(i).getTextContent();
 			
@@ -112,6 +116,7 @@ public class RSSImporter implements IImporter {
 				}
 			}
 			else {
+				
 				attributes.put(tag, new Attribute(text));
 			}
 		}
