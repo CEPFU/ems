@@ -29,6 +29,7 @@ public class ApacheCamelTutorial {
 		@Override
 		public void process(Exchange exchange) throws Exception {
 
+			System.out.println("Header: " + exchange.getIn().getHeaders());
 			System.out.println("Test: " + exchange.getIn().getBody(String.class));
 		}
 	}	

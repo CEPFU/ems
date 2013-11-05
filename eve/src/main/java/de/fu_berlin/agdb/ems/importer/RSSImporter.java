@@ -1,4 +1,4 @@
-package de.fu_berlin.agdb.eve.importer;
+package de.fu_berlin.agdb.ems.importer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,10 +22,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import de.fu_berlin.agdb.eve.data.Attribute;
-import de.fu_berlin.agdb.eve.data.IAttribute;
-import de.fu_berlin.agdb.eve.data.IEvent;
-import de.fu_berlin.agdb.eve.data.Event;
+import de.fu_berlin.agdb.ems.data.Attribute;
+import de.fu_berlin.agdb.ems.data.Event;
+import de.fu_berlin.agdb.ems.data.IAttribute;
+import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
  * Importer for RSS feeds. Turns RSS xml files into RSSEvents.

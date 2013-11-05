@@ -3,6 +3,7 @@ package de.fu_berlin.agdb.eve.loader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import de.fu_berlin.agdb.ems.loader.URLLoader;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

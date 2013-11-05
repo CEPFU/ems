@@ -1,4 +1,4 @@
-package de.fu_berlin.agdb.eve.importer;
+package de.fu_berlin.agdb.ems.importer;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -10,23 +10,28 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import de.fu_berlin.agdb.eve.data.Attribute;
-import de.fu_berlin.agdb.eve.data.Event;
-import de.fu_berlin.agdb.eve.data.IAttribute;
-import de.fu_berlin.agdb.eve.data.IEvent;
+import de.fu_berlin.agdb.ems.data.Attribute;
+import de.fu_berlin.agdb.ems.data.Event;
+import de.fu_berlin.agdb.ems.data.IAttribute;
+import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
  * Importer for comma separated files.
  * @author Ralf Oechsner
  *
  */
-public class CSVImporter implements IImporter {
+public class CSVImporter implements IImporter, ISplitter {
 
 	private List<IEvent> events;
 	private String csvText;
 	private String timeStampCaption;
 	private String timeStampFormat;
 	private String separator;
+	
+	public CSVImporter() {
+		
+		
+	}
 	
 	/**
 	 * Importer for CSV files.
@@ -38,6 +43,22 @@ public class CSVImporter implements IImporter {
 	public CSVImporter(String csvText, String timeStampCaption, String timeStampFormat, String separator) {
 		
 		this.csvText = csvText;
+		this.timeStampCaption = timeStampCaption;
+		this.timeStampFormat = timeStampFormat;
+		this.separator = separator;
+		this.events = new ArrayList<IEvent>();
+		this.parseCSV();
+	}
+	
+	/**
+	 * Importer for CSV files.
+	 * @param csvText text of CSV file. First line must contain captions of columns.
+	 * @param timeStampCaption caption of time stamp column (case sensitive!).
+	 * @param timeStampFormat format string of time stamp (see java.text.SimpleDateFormat).
+	 * @param separator separator of columns (e.g. "," or ";" or "\t").
+	 */
+	public CSVImporter(String timeStampCaption, String timeStampFormat, String separator) {
+
 		this.timeStampCaption = timeStampCaption;
 		this.timeStampFormat = timeStampFormat;
 		this.separator = separator;
@@ -121,4 +142,11 @@ public class CSVImporter implements IImporter {
 		return this.events;
 	}
 
+	@Override
+	public List<IEvent> splitMessage(String header, String body) {
+
+		this.parseCSV();
+		
+		return this.events;
+	}
 }

@@ -16,9 +16,11 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.agdb.eve.data.Attribute;
-import de.fu_berlin.agdb.eve.data.Event;
-import de.fu_berlin.agdb.eve.data.IAttribute;
+import de.fu_berlin.agdb.ems.data.Attribute;
+import de.fu_berlin.agdb.ems.data.Event;
+import de.fu_berlin.agdb.ems.data.IAttribute;
+import de.fu_berlin.agdb.ems.importer.CSVImporter;
+import de.fu_berlin.agdb.ems.importer.IImporter;
 
 /**
  * Test for the CSVImporter.

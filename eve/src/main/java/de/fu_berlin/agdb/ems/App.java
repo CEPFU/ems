@@ -1,9 +1,9 @@
-package de.fu_berlin.agdb.eve;
+package de.fu_berlin.agdb.ems;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import de.fu_berlin.agdb.eve.loader.URLLoader;
+import de.fu_berlin.agdb.ems.loader.URLLoader;
 
 /**
  * Hello world!

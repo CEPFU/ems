@@ -1,8 +1,8 @@
-package de.fu_berlin.agdb.eve.importer;
+package de.fu_berlin.agdb.ems.importer;
 
 import java.util.List;
 
-import de.fu_berlin.agdb.eve.data.IEvent;
+import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
  * Interface for generic importer.

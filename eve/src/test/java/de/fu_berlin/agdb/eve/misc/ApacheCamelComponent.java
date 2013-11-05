@@ -71,7 +71,7 @@ public class ApacheCamelComponent {
 		try {
 			context.addRoutes(new RouteBuilder() {
 			    public void configure() {
-			    	from("test-jms:queue:test.queue").process(new Verbose());
+//			    	from("test-jms:queue:test.queue").split().method().process(new Verbose());
 			    }
 			});
 			
