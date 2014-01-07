@@ -3,7 +3,10 @@ package de.fu_berlin.agdb.ems.loader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
+
+import de.fu_berlin.agdb.ems.core.Tag;
 
 
 /**
@@ -20,9 +23,14 @@ public class URLLoader implements ILoader {
 	 * Loader for any file that can be loaded with an URL (e.g. via HTTP).
 	 * @param url URL of file to load.
 	 */
-	public URLLoader(URL url) {
+	public URLLoader(@Tag(value = "url") String url) {
 		
-		this.url = url;
+		try {
+			this.url = new URL(url);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.text = "";  // start with an empty string
 	}
 

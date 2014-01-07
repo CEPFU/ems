@@ -28,11 +28,6 @@ public class CSVImporter implements IImporter, ISplitter {
 	private String timeStampFormat;
 	private String separator;
 	
-	public CSVImporter() {
-		
-		
-	}
-	
 	/**
 	 * Importer for CSV files.
 	 * @param csvText text of CSV file. First line must contain captions of columns.
