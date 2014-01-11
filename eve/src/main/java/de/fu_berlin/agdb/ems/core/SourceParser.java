@@ -23,29 +23,36 @@ import java.util.Set;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
 
 import de.fu_berlin.agdb.ems.importer.IImporter;
 import de.fu_berlin.agdb.ems.loader.ILoader;
 
 /**
- * Loads interests from XML text/files.
+ * Loads sources from XML text/files.
  * @author Ralf Oechsner
  *
  */
-public class InterestParser implements Processor {
+public class SourceParser implements Processor {
 
 	public static final String LOADER_PACKAGE = "de.fu_berlin.agdb.ems.loader";
 	public static final String IMPORTER_PACKAGE = "de.fu_berlin.agdb.ems.importer";
 	public static final String LOADER_PREFIX = "loader";
 	public static final String IMPORTER_PREFIX = "importer";
 	
+	// Stores the declarations of the constructors of all loader and importer classes
+	// First map stores a list of constructor declarations for the class name (in the String).
+	// The map inside the List stores pairs of tags (defined in annotations) and the  
 	private Map<String, List<Map<String, Class<?>>>> loaderParameters;
 	private Map<String, List<Map<String, Class<?>>>> importerParameters;
 	
+	// temporary hack TODO: do better
+	private ILoader parsedLoader;
+	
 	/**
-	 * Loads the interest parser.
+	 * Loads the source parser.
 	 */
-	public InterestParser() {
+	public SourceParser() {
 
 		this.generateParameters();
 	}
@@ -155,15 +162,15 @@ public class InterestParser implements Processor {
 	}
 	
 	/**
-	 * Parses interest message.
-	 * @param interest interest message.
+	 * Parses source definition.
+	 * @param source source definition.
 	 */
-	public void parse(String interest) {
+	public void parse(String source) {
 		
 		// all interests are "properties files"
 		Properties prop = new Properties();
 		try {
-			prop.load(new ByteArrayInputStream(interest.getBytes("UTF-8")));
+			prop.load(new ByteArrayInputStream(source.getBytes("UTF-8")));
 
 			// first the loader
 			String loader = prop.getProperty("loader");
@@ -192,9 +199,8 @@ public class InterestParser implements Processor {
 						}
 						
 						ILoader loaderObject = (ILoader) constructor.newInstance(paramValues);
-						System.out.println("loaded");
+						this.parsedLoader = loaderObject;
 						loaderObject.load();
-						System.out.println(loaderObject.getText());
 						
 						
 					} catch (ClassNotFoundException e) {
@@ -265,6 +271,12 @@ public class InterestParser implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
+		
+		// first parse the message and find out loader and importer
 		this.parse(exchange.getIn().getBody(String.class));
+		
+		// then send messages into the queue
+		ProducerTemplate template = exchange.getContext().createProducerTemplate();
+		template.sendBody("ems-jms:queue:main.queue", parsedLoader.getText());
 	}
 }

@@ -12,7 +12,7 @@ import org.junit.Test;
  * @author Ralf Oechsner
  *
  */
-public class InterestParserTest {
+public class SourceParserTest {
 
 	/**
 	 * @throws java.lang.Exception
@@ -29,7 +29,7 @@ public class InterestParserTest {
 				+ "importer = CSVImporter\n"
 				+ "importer.separator = ;\n";
 		
-		InterestParser parser = new InterestParser();
+		SourceParser parser = new SourceParser();
 		parser.parse(properties);
 		
 		assertTrue(true);
