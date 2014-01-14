@@ -21,7 +21,8 @@ public class CSVSplitter {
 
 	public List<IEvent> split(String body) {
 		
-		CSVImporter importer = new CSVImporter(body, "Time", "EEE MMM dd HH:mm:ss z YYYY", ";");
+		CSVImporter importer = new CSVImporter("Time", "EEE MMM dd HH:mm:ss z YYYY", ";");
+		importer.load(body);
 		
 		return importer.getEvents();
 	}

@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Data structure for backend configuration.
@@ -16,8 +19,9 @@ public class Configuration {
 	
 	public static final String CONFIG_PATH = "config/main.properties";
 
+	private static Logger logger = LogManager.getLogger();
 	private Properties properties;
-	private String interestsFolder = "interests";
+	private String sourcesFolder = "sources";
 	
 	/**
 	 * Main configuration.
@@ -32,10 +36,15 @@ public class Configuration {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void load() throws FileNotFoundException, IOException {
+	public void load() throws FileNotFoundException {
 		
-		 properties.load(new FileInputStream(CONFIG_PATH));
-		 this.interestsFolder = properties.getProperty("interestsfolder");
+		 try {
+			properties.load(new FileInputStream(CONFIG_PATH));
+			 this.sourcesFolder = properties.getProperty("sourcesfolder");
+			 logger.info("Configuration file " + CONFIG_PATH + " loaded.");
+		} catch (IOException e) {
+			logger.error("Configuration file cannot be loaded!", e);
+		}
 	}
 	
 	/**
@@ -43,10 +52,16 @@ public class Configuration {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void save() throws FileNotFoundException, IOException {
+	public void save() throws FileNotFoundException {
 		
-		properties.setProperty("interestsfolder", interestsFolder);
-		properties.store(new FileOutputStream("config/main.properties"), "Main Configuration");
+		properties.setProperty("sourcesfolder", sourcesFolder);
+		
+		try {
+			properties.store(new FileOutputStream("config/main.properties"), "Main Configuration");
+		} catch (IOException e) {
+			logger.error("Could not write configuration file.", e);
+		}
+		
 	}
 	
 	/**
@@ -60,22 +75,19 @@ public class Configuration {
 			try {
 				// save default configuration if no configuration file exists
 				this.save();
+				logger.info("Configuration file didn't exist. Default configuration was created.");
 			} catch (FileNotFoundException e1) {
-				System.err.println("Configuration file not accessible!");
-			} catch (IOException e1) {
-				System.err.println("Configuration file cannot be created!");
+				logger.error("Configuration file not accessible!", e1);
 			}
-		} catch (IOException e) {
-			System.err.println("Configuration file cannot be loaded!");
 		}
 	}
 
-	public String getInterestsFolder() {
-		return interestsFolder;
+	public String getSourcesFolder() {
+		return sourcesFolder;
 	}
 
-	public void setInterestsFolder(String interestsFolder) {
-		this.interestsFolder = interestsFolder;
+	public void setSourcesFolder(String sourcesFolder) {
+		this.sourcesFolder = sourcesFolder;
 	}
 	
 }

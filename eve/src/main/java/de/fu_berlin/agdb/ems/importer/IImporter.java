@@ -12,6 +12,12 @@ import de.fu_berlin.agdb.ems.data.IEvent;
 public interface IImporter {
 
 	/**
+	 * Loads source text and generates events from it.
+	 * @param text source text.
+	 */
+	public void load(String text);
+	
+	/**
 	 * List of imported events.
 	 * @return imported events.
 	 */

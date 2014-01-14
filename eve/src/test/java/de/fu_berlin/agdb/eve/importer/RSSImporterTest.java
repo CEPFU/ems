@@ -106,7 +106,8 @@ public class RSSImporterTest {
     			"</rss>";	
 		
 		
-    	RSSImporter importer = new RSSImporter(xmlText);
+    	RSSImporter importer = new RSSImporter();
+    	importer.load(xmlText);
 
     	this.compare(importer);
     }

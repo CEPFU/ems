@@ -14,17 +14,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import de.fu_berlin.agdb.ems.data.IEvent;
 import de.fu_berlin.agdb.ems.importer.IImporter;
 import de.fu_berlin.agdb.ems.loader.ILoader;
 
@@ -40,14 +42,13 @@ public class SourceParser implements Processor {
 	public static final String LOADER_PREFIX = "loader";
 	public static final String IMPORTER_PREFIX = "importer";
 	
-	// Stores the declarations of the constructors of all loader and importer classes
-	// First map stores a list of constructor declarations for the class name (in the String).
-	// The map inside the List stores pairs of tags (defined in annotations) and the  
-	private Map<String, List<Map<String, Class<?>>>> loaderParameters;
-	private Map<String, List<Map<String, Class<?>>>> importerParameters;
+	private static Logger logger = LogManager.getLogger();
 	
-	// temporary hack TODO: do better
-	private ILoader parsedLoader;
+	// Stores the declarations of the constructors of all loader and importer classes
+	// The map stores a list of constructor declarations for the class name (in the String).
+	// The second list contains all tags of a declaration.
+	private Map<String, List<List<String>>> loaderParameters;
+	private Map<String, List<List<String>>> importerParameters;
 	
 	/**
 	 * Loads the source parser.
@@ -62,21 +63,21 @@ public class SourceParser implements Processor {
 	 */
 	private void generateParameters() {
 
-		// first loaders
-		this.loaderParameters = new Hashtable<String, List<Map<String,Class<?>>>>();
+		// first look for loaders in the loader package
+		this.loaderParameters = new Hashtable<String, List<List<String>>>();
 		List<Class<?>> loaders = this.findClasses(ILoader.class, LOADER_PACKAGE);
-		
 		for (Class<?> curLoader : loaders) {
 			this.loaderParameters.put(curLoader.getSimpleName(), this.classParameters(curLoader));
 		}
+		logger.info("Found the following loader plugins: " + loaderParameters.keySet());
 		
-		// then importers
-		this.importerParameters = new Hashtable<String, List<Map<String,Class<?>>>>();
+		// then for importers in the importer package
+		this.importerParameters = new Hashtable<String, List<List<String>>>();
 		List<Class<?>> importers = this.findClasses(IImporter.class, IMPORTER_PACKAGE);
-		
 		for (Class<?> curLoader : importers) {
 			this.importerParameters.put(curLoader.getSimpleName(), this.classParameters(curLoader));
 		}
+		logger.info("Found the following importer plugins: " + importerParameters.keySet());
 	}
 	
 	/**
@@ -112,11 +113,12 @@ public class SourceParser implements Processor {
 					}
 				} catch (ClassNotFoundException e) {
 					// shouldn't happen because only classes that are found before are searched for again
+					logger.error(e);
 				}
 			}
 		} catch (UnsupportedEncodingException e1) {
 			// also shouldn't happen because of file system encoding
-			e1.printStackTrace();
+			logger.error(e1);
 		}
 		
 		return classes;
@@ -130,29 +132,25 @@ public class SourceParser implements Processor {
 	 * @param c class for which the parameters should be generated.
 	 * @return list of maps with constructor parameters.
  	 */
-	private List<Map<String, Class<?>>> classParameters(Class<?> c) {
+	private List<List<String>> classParameters(Class<?> c) {
 		
-		List<Map<String, Class<?>>> parametersList = new ArrayList<Map<String, Class<?>>>();
+		List<List<String>> parametersList = new ArrayList<List<String>>();
 		
 		Constructor<?>[] constructors = c.getConstructors();
 		for (Constructor<?> curConstr : constructors) {
 			
 			// new parameter map for every constructor
-			Map<String, Class<?>> parameters = new Hashtable<String, Class<?>>();
+			List<String> parameters = new ArrayList<String>();
 			parametersList.add(parameters);
 
-			Class<?>[] paramTypes = curConstr.getParameterTypes();
 			Annotation[][] tags = curConstr.getParameterAnnotations();
-
-			int i = 0;
 			for(Annotation[] annotations : tags){
-				Class<?> parameterType = paramTypes[i++];
 
 				for(Annotation annotation : annotations) {
 
 					if (annotation instanceof Tag) {
 						Tag tagAnn = (Tag) annotation;
-						parameters.put(tagAnn.value(), parameterType);
+						parameters.add(tagAnn.value());
 					}
 				}
 			}
@@ -162,10 +160,63 @@ public class SourceParser implements Processor {
 	}
 	
 	/**
+	 * Instantiate a class with given parameters for it's constructor.
+	 * @param className name of class that is instantiated (full package name).
+	 * @param parameters list of tags of parameters (in the right order).
+	 * @param prop property object where parameter values are stored.
+	 * @param prefix prefix of the importer / loader.
+	 * @return instantiation of the class.
+	 */
+	public Object loadClass(String className, List<String> parameters, Properties prop, String prefix) {
+		
+		try {
+			Class<?> loaderClass = Class.forName(className);
+			
+			// parameter must be always Strings
+			Class<?>[] paramTypes = new Class[parameters.size()];
+			for (int i = 0; i < paramTypes.length; i++)
+				paramTypes[i] = String.class;
+			Constructor<?> constructor = loaderClass.getConstructor(paramTypes);
+			
+			// build array with values in right order
+			Object[] paramValues = new Object[parameters.size()];
+			int i = 0;
+			for (String curEntry : parameters) {
+				paramValues[i++] = prop.getProperty(prefix + "." + curEntry);
+			}
+			
+			return constructor.newInstance(paramValues);
+		} catch (ClassNotFoundException e) {
+			// should not happen because only classes that where previously found are loaded
+			logger.error(e);
+		} catch (InstantiationException e) {
+			// should also not happen because of previous reason
+			logger.error(e);
+		} catch (IllegalAccessException e) {
+			// same
+			logger.error(e);
+		} catch (IllegalArgumentException e) {
+			// same
+			logger.error(e);
+		} catch (InvocationTargetException e) {
+			// same
+			logger.error(e);
+		} catch (NoSuchMethodException e) {
+			// same
+			logger.error(e);
+		} catch (SecurityException e) {
+			// same
+			logger.error(e);
+		}		
+		
+		return null;
+	}
+	
+	/**
 	 * Parses source definition.
 	 * @param source source definition.
 	 */
-	public void parse(String source) {
+	public IImporter parse(String source) {
 		
 		// all interests are "properties files"
 		Properties prop = new Properties();
@@ -174,109 +225,122 @@ public class SourceParser implements Processor {
 
 			// first the loader
 			String loader = prop.getProperty("loader");
-			List<Map<String, Class<?>>> loaderParameters = this.loaderParameters.get(loader);
-			// TODO: check for NULL
+			logger.info("Loader specified in source file: " + loader);
+			List<List<String>> loaderParameters = this.loaderParameters.get(loader);
+			if (loaderParameters == null) {
+				logger.error("Loader specified in source file could not be found! Not loading source.");
+				return null;
+			}
+				
+			ILoader loaderObject = null;
 			
-			for (Map<String, Class<?>> curParameters : loaderParameters) {
+			for (List<String> curParameters : loaderParameters) {
 				
 				// check if all parameters of the properties file match the parameters of the loader
-				if (curParameters.keySet().equals(this.getPropertiesWithPrefix(LOADER_PREFIX, prop))) {
-					System.out.println("found match: " + curParameters.keySet());
+				if (curParameters.equals(this.getPropertiesWithPrefix(LOADER_PREFIX, prop))) {
+					
 					// now load class
-				    try {
-						Class<?> loaderClass = Class.forName(LOADER_PACKAGE + "." + loader);
-						// parameter must be always Strings
-						Class<?>[] paramTypes = new Class[curParameters.keySet().size()];
-						for (int i = 0; i < paramTypes.length; i++)
-							paramTypes[i] = String.class;
-						Constructor<?> constructor = loaderClass.getConstructor(paramTypes);
-						
-						// build array with values in right order
-						Object[] paramValues = new Object[curParameters.entrySet().size()];
-						int i = 0;
-						for (String curEntry : curParameters.keySet()) {							
-							paramValues[i++] = prop.getProperty(LOADER_PREFIX + "." + curEntry);
-						}
-						
-						ILoader loaderObject = (ILoader) constructor.newInstance(paramValues);
-						this.parsedLoader = loaderObject;
-						loaderObject.load();
-						
-						
-					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (NoSuchMethodException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SecurityException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InstantiationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				    loaderObject = (ILoader) this.loadClass(LOADER_PACKAGE + "." + loader, curParameters, prop, LOADER_PREFIX);
+				    break; // only first possible match is used
 				}
+			}
+
+			// when no loader was found there's no need for parsing the importer
+			if (loaderObject == null) {
+				logger.error("No matching loader declaration found! Not loading source.");
+				return null;
 			}
 			
 			// now the importer
+			IImporter importerObject = null;
 			String importer = prop.getProperty("importer");
-			List<Map<String, Class<?>>> importerParameters = this.importerParameters.get(importer);
+			List<List<String>> importerParameters = this.importerParameters.get(importer);
+			if (importerParameters == null) {
+				logger.error("Importer specified in source file could not be found! Not loading source.");
+				return null;
+			}
 			
-			for (Map<String, Class<?>> curParameters : importerParameters) {
+			for (List<String> curParameters : importerParameters) {
 				
-				if (curParameters.keySet().equals(this.getPropertiesWithPrefix(IMPORTER_PREFIX, prop))) {
-					System.out.println("found match: " + curParameters.keySet());
-					// now load class
+				if (equalsIgnoringOrder(curParameters, this.getPropertiesWithPrefix(IMPORTER_PREFIX, prop))) {
+			
+					importerObject = (IImporter) this.loadClass(IMPORTER_PACKAGE + "." + importer, curParameters, prop, IMPORTER_PREFIX);
+					break; // only first possible importer (shouldn't be more than one anyway)
 				}
 			}
 			
+			if (importerObject != null) {
+				logger.info("Loading source.");
+				loaderObject.load();
+				logger.info("Done.");
+				logger.info("Importing events.");
+				importerObject.load(loaderObject.getText());
+				logger.info("Done.");
+			}
+			
+			return importerObject;
 		} catch (UnsupportedEncodingException e) {
 			// shouldn't happen because all internal encoding is done in UTF-8
-			e.printStackTrace();
+			logger.error(e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 		}
+		
+		// should never happen. Only for compiling reasons.
+		return null;
 	}
 	
 	/**
 	 * Finds properties that start with a certain prefix separated by a "." and returns them in
-	 * a new set without the prefixes.
+	 * a new list without the prefixes.
 	 * @param prefix prefix of property.
 	 * @param properties properties object.
 	 * @return subset of properties starting without the prefix.
 	 */
-	private Set<String> getPropertiesWithPrefix(String prefix, Properties properties) {
-		
-		Set<String> set = new HashSet<String>();
+	private List<String> getPropertiesWithPrefix(String prefix, Properties properties) {
+
+		List<String> list = new ArrayList<String>();
 		
 		for (String curString : properties.stringPropertyNames()) {
 			if (curString.startsWith(prefix + ".")) {
-				set.add(curString.substring(prefix.length() + 1)); // + 1 because of the dot
+				list.add(curString.substring(prefix.length() + 1)); // + 1 because of the dot
 			}
 		}
 		
-		return set;
+		return list;
 	}
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		
+		logger.info("Source file loaded.");
+		
 		// first parse the message and find out loader and importer
-		this.parse(exchange.getIn().getBody(String.class));
+		IImporter importer = this.parse(exchange.getIn().getBody(String.class));
+		if (importer == null)
+			return;
 		
 		// then send messages into the queue
 		ProducerTemplate template = exchange.getContext().createProducerTemplate();
-		template.sendBody("ems-jms:queue:main.queue", parsedLoader.getText());
+		for (IEvent curEvent : importer.getEvents()) {
+			template.sendBody("ems-jms:queue:main.queue", curEvent.toString());
+		}
+	}
+	
+	/**
+	 * Checks if two collections (e.g. lists) contain equal objects (ignoring the order). 
+	 * @param c1 first collection.
+	 * @param c2 second collection.
+	 * @return true if equal false otherwise.
+	 */
+	public static <T> boolean equalsIgnoringOrder(Collection<T> c1, Collection<T> c2) {
+		
+		if (c1.size() != c2.size())
+			return false;
+		
+		if (c1.containsAll(c2))
+			return true;
+		
+		return false;
 	}
 }

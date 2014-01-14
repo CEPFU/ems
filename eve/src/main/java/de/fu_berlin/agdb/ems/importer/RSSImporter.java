@@ -34,24 +34,22 @@ import de.fu_berlin.agdb.ems.data.IEvent;
  */
 public class RSSImporter implements IImporter {
 
-	private String xmlText;
+
 	private List<IEvent> events;
 	
 	/**
 	 * Construct RSSEvents from XML-Text.
 	 * @param xmlText XML-Text.
 	 */
-	public RSSImporter(String xmlText) {
-		
-		this.xmlText = xmlText;
+	public RSSImporter() {
+
 		this.events = new ArrayList<IEvent>();
-		this.parseXML();
 	}
 	
 	/**
 	 * Parses XML document and generate event list from it.
 	 */
-	private void parseXML() {
+	private void parseXML(String xmlText) {
 			
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -132,6 +130,10 @@ public class RSSImporter implements IImporter {
 		
 		return this.events;
 	}
-	
-	
+
+	@Override
+	public void load(String text) {
+
+		this.parseXML(text);
+	}	
 }

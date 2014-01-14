@@ -87,7 +87,8 @@ public class CSVImporterTest {
 				"Sat Dec 29 14:02:12 CET 2012;33;66\n" + 
 				"Sun Dec 30 17:12:23 CET 2012;-2;5";
 		
-		CSVImporter importer = new CSVImporter(text, "Time", this.timeStampFormat, ";");
+		CSVImporter importer = new CSVImporter("Time", this.timeStampFormat, ";");
+		importer.load(text);
 		
 		this.compare(importer);
 	}
@@ -101,7 +102,8 @@ public class CSVImporterTest {
 				"Sat Dec 29 14:02:12 CET 2012,33,66\n" + 
 				"Sun Dec 30 17:12:23 CET 2012,-2,5";
 		
-		CSVImporter importer = new CSVImporter(text, "Time", this.timeStampFormat, ",");
+		CSVImporter importer = new CSVImporter("Time", this.timeStampFormat, ",");
+		importer.load(text);
 		
 		this.compare(importer);
 	}
@@ -115,7 +117,8 @@ public class CSVImporterTest {
 				"33;Sat Dec 29 14:02:12 CET 2012;66\n" + 
 				"-2;Sun Dec 30 17:12:23 CET 2012;5";
 		
-		CSVImporter importer = new CSVImporter(text, "Time", this.timeStampFormat, ";");
+		CSVImporter importer = new CSVImporter("Time", this.timeStampFormat, ";");
+		importer.load(text);
 		
 		this.compare(importer);
 	}
