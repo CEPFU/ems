@@ -1,7 +1,7 @@
  /**
  * 
  */
-package de.fu_berlin.agdb.eve.misc;
+package de.fu_berlin.agdb.ems.misc;
 
 import static org.junit.Assert.assertTrue;
 

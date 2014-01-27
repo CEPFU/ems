@@ -94,7 +94,11 @@ public class CSVImporter implements IImporter, ISplitter {
 				String token = st.nextToken();
 				// normal attribute
 				if (col != timeStampCol) {
-					curAttributes.put(keys.get(col), new Attribute(token));
+					if (col == 2) {
+						curAttributes.put(keys.get(col), new Attribute(Integer.valueOf(token)));
+					} else {
+						curAttributes.put(keys.get(col), new Attribute(token));
+					}
 				}
 				// time stamp
 				else {

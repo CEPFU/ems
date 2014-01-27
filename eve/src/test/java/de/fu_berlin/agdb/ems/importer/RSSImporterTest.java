@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.agdb.eve.importer;
+package de.fu_berlin.agdb.ems.importer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -63,7 +63,7 @@ public class RSSImporterTest {
 	}
 	
 	@Before
-	public void init() throws ParseException {
+	public void setUp() throws ParseException {
 		
 		this.testEvents = new ArrayList<Event>();
 		this.timeStampFormat = "EEE, dd MMM YYYY HH:mm:ss z";

@@ -1,4 +1,4 @@
-package de.fu_berlin.agdb.eve;
+package de.fu_berlin.agdb.ems;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

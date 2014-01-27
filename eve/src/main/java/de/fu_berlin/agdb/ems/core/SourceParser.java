@@ -323,8 +323,20 @@ public class SourceParser implements Processor {
 		// then send messages into the queue
 		ProducerTemplate template = exchange.getContext().createProducerTemplate();
 		for (IEvent curEvent : importer.getEvents()) {
-			template.sendBody("ems-jms:queue:main.queue", curEvent.toString());
+			template.sendBody("ems-jms:queue:main.queue", curEvent);
 		}
+	}
+	
+	public List<IEvent> split(String body) {
+		
+		logger.info("Source file loaded.");
+		
+		// first parse the message and find out loader and importer
+		IImporter importer = this.parse(body);
+		if (importer == null)
+			return null;
+		
+		return importer.getEvents();
 	}
 	
 	/**

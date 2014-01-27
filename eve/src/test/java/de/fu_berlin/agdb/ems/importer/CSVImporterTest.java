@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.agdb.eve.importer;
+package de.fu_berlin.agdb.ems.importer;
 
 import static org.junit.Assert.assertTrue;
 
@@ -66,7 +66,7 @@ public class CSVImporterTest {
 	}
 	
 	@Before
-	public void init() throws ParseException {
+	public void setUp() throws ParseException {
 		
 		testEvents = new ArrayList<Event>();
 		timeStampFormat = "EEE MMM dd HH:mm:ss z YYYY";
