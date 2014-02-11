@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.agdb.ems.importer;
+package de.fu_berlin.agdb.ems.inputadapters;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,8 +19,8 @@ import org.junit.Test;
 import de.fu_berlin.agdb.ems.data.Attribute;
 import de.fu_berlin.agdb.ems.data.Event;
 import de.fu_berlin.agdb.ems.data.IAttribute;
-import de.fu_berlin.agdb.ems.importer.IImporter;
-import de.fu_berlin.agdb.ems.importer.RSSImporter;
+import de.fu_berlin.agdb.ems.inputadapters.IInputAdapter;
+import de.fu_berlin.agdb.ems.inputadapters.RSSInputAdapter;
 
 
 
@@ -28,7 +28,7 @@ import de.fu_berlin.agdb.ems.importer.RSSImporter;
  * @author Ralf Oechsner
  *
  */
-public class RSSImporterTest {
+public class RSSInputAdapterTest {
 	
 	private List<Event> testEvents;
 	private String timeStampFormat;
@@ -52,13 +52,13 @@ public class RSSImporterTest {
 	
 	/**
 	 * Compares hard coded events to imported events.
-	 * @param importer importer.
+	 * @param inputAdapter InputAdapter.
 	 */
-	private void compare(IImporter importer) {
+	private void compare(IInputAdapter inputAdapter) {
 		
 		for (int i = 0; i < this.testEvents.size(); i++) {
 
-			assertEquals("Events don't match!", this.testEvents.get(i), importer.getEvents().get(i));
+			assertEquals("Events don't match!", this.testEvents.get(i), inputAdapter.getEvents().get(i));
 		}
 	}
 	
@@ -106,9 +106,9 @@ public class RSSImporterTest {
     			"</rss>";	
 		
 		
-    	RSSImporter importer = new RSSImporter();
-    	importer.load(xmlText);
+    	RSSInputAdapter inputAdapter = new RSSInputAdapter();
+    	inputAdapter.load(xmlText);
 
-    	this.compare(importer);
+    	this.compare(inputAdapter);
     }
 }

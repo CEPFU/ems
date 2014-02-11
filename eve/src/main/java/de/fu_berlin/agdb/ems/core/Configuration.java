@@ -82,12 +82,19 @@ public class Configuration {
 		}
 	}
 
+	/**
+	 * Returns path of the folder for source files.
+	 * @return path of source file folder
+	 */
 	public String getSourcesFolder() {
 		return sourcesFolder;
 	}
 
+	/**
+	 * Sets path of the folder for source files.
+	 * @param sourcesFolder path of source file folder
+	 */
 	public void setSourcesFolder(String sourcesFolder) {
 		this.sourcesFolder = sourcesFolder;
 	}
-	
 }

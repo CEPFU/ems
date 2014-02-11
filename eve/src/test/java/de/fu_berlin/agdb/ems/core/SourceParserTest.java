@@ -26,7 +26,7 @@ public class SourceParserTest {
 
 		String properties = "loader = URLLoader\n"
 				+ "loader.url = http://www.gnu.org/licenses/gpl-3.0-standalone.html\n"
-				+ "importer = CSVImporter\n"
+				+ "importer = CSVInputAdapter\n"
 				+ "importer.separator = ;\n";
 		
 		SourceParser parser = new SourceParser();

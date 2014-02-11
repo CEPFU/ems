@@ -1,4 +1,4 @@
-package de.fu_berlin.agdb.ems.importer;
+package de.fu_berlin.agdb.ems.inputadapters;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -17,11 +17,11 @@ import de.fu_berlin.agdb.ems.data.IAttribute;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
- * Importer for comma separated files.
+ * InputAdapter for comma separated files.
  * @author Ralf Oechsner
  *
  */
-public class CSVImporter implements IImporter, ISplitter {
+public class CSVInputAdapter implements IInputAdapter, ISplitter {
 
 	private List<IEvent> events;
 	private String timeStampCaption;
@@ -29,13 +29,13 @@ public class CSVImporter implements IImporter, ISplitter {
 	private String separator;
 	
 	/**
-	 * Importer for CSV files.
+	 * InputAdapter for CSV files.
 	 * @param csvText text of CSV file. First line must contain captions of columns.
 	 * @param timeStampCaption caption of time stamp column (case sensitive!).
 	 * @param timeStampFormat format string of time stamp (see java.text.SimpleDateFormat).
 	 * @param separator separator of columns (e.g. "," or ";" or "\t").
 	 */
-	public CSVImporter(@Tag("timeStampCaption") String timeStampCaption, @Tag("timeStampFormat") String timeStampFormat, @Tag("separator") String separator) {
+	public CSVInputAdapter(@Tag("timeStampCaption") String timeStampCaption, @Tag("timeStampFormat") String timeStampFormat, @Tag("separator") String separator) {
 
 		this.timeStampCaption = timeStampCaption;
 		this.timeStampFormat = timeStampFormat;
@@ -94,11 +94,7 @@ public class CSVImporter implements IImporter, ISplitter {
 				String token = st.nextToken();
 				// normal attribute
 				if (col != timeStampCol) {
-					if (col == 2) {
-						curAttributes.put(keys.get(col), new Attribute(Integer.valueOf(token)));
-					} else {
-						curAttributes.put(keys.get(col), new Attribute(token));
-					}
+					curAttributes.put(keys.get(col), new Attribute(token));
 				}
 				// time stamp
 				else {

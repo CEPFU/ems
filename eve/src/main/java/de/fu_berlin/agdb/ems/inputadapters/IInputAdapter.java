@@ -1,15 +1,15 @@
-package de.fu_berlin.agdb.ems.importer;
+package de.fu_berlin.agdb.ems.inputadapters;
 
 import java.util.List;
 
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
- * Interface for generic importer.
+ * Interface for generic InputAdapter.
  * @author Ralf Oechsner
  *
  */
-public interface IImporter {
+public interface IInputAdapter {
 
 	/**
 	 * Loads source text and generates events from it.

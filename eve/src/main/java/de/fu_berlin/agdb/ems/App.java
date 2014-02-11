@@ -2,7 +2,6 @@ package de.fu_berlin.agdb.ems;
 
 import static de.fu_berlin.agdb.ems.algebra.dsl.CoreBuilder.attribute;
 import static de.fu_berlin.agdb.ems.algebra.dsl.LogicOperatorBuilder.and;
-import static de.fu_berlin.agdb.ems.algebra.dsl.NumericOperatorBuilder.less;
 
 import java.util.Date;
 import java.util.Hashtable;
@@ -20,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.fu_berlin.agdb.ems.algebra.Algebra;
 import de.fu_berlin.agdb.ems.algebra.Profile;
-import de.fu_berlin.agdb.ems.algebra.notifications.VerboseNotification;
+import de.fu_berlin.agdb.ems.algebra.notifications.CompositeEventNotification;
 import de.fu_berlin.agdb.ems.core.Configuration;
 import de.fu_berlin.agdb.ems.core.SourceParser;
 import de.fu_berlin.agdb.ems.data.Attribute;
@@ -53,27 +52,32 @@ public class App {
 
 		logger.info("Looking for interest files in: " + mainConfiguration.getSourcesFolder());
 		try {
-//			// this route prints everything that is loaded into the queue (for debugging purposes)
-//			camelContext.addRoutes(new RouteBuilder() {
-//			    public void configure() {
-//			    	from("ems-jms:queue:main.queue").process(new Algebra());
-//			    }
-//			});
 			
-			final Algebra algebra = new Algebra();
+			final Algebra algebra = new Algebra(camelContext);
 			
 			Map<String, IAttribute> attributes1 = new Hashtable<String, IAttribute>();
 			attributes1.put("Humidity", new Attribute(new Integer(25)));
 			Event event1 = new Event(new Date(), attributes1);
-			algebra.addProfile(new Profile(and(attribute("Temperature"), attribute("Humidity")), new VerboseNotification("FOUND MATCH")));
+			algebra.addProfile(new Profile(and(attribute("Temperature"), attribute("Humidity")), new CompositeEventNotification(new Event("description", "SEND CEP"))));
 			
 			// this route loads source files from disk and process them via the InterestParser
 			camelContext.addRoutes(new RouteBuilder() {
 			    public void configure() {
 			    	// source files are moved to "inprogress" during processing and to "done" after processing
-			    	from("file://" + mainConfiguration.getSourcesFolder() + "?preMove=inprogress/&move=../done/&moveFailed=failed/").split().method(SourceParser.class, "split").process(algebra);
+					from(
+							"file://"
+									+ mainConfiguration.getSourcesFolder()
+									+ "?preMove=inprogress/&move=../done/&moveFailed=failed/")
+							.split().method(SourceParser.class, "split").to(Algebra.EVENT_QUEUE_URI);
 			    }
-			});	
+			});
+			
+			// this route processes all events of the main event queue with the algebra system
+			camelContext.addRoutes(new RouteBuilder() {
+			    public void configure() {
+					from(Algebra.EVENT_QUEUE_URI).to("ems-jms:queue:main.queue").process(algebra);
+			    }
+			});
 			
 			// start context and run indefinitely
 			camelContext.start();

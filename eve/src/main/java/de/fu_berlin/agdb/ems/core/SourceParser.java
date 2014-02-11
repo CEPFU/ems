@@ -27,7 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.fu_berlin.agdb.ems.data.IEvent;
-import de.fu_berlin.agdb.ems.importer.IImporter;
+import de.fu_berlin.agdb.ems.inputadapters.IInputAdapter;
 import de.fu_berlin.agdb.ems.loader.ILoader;
 
 /**
@@ -38,17 +38,17 @@ import de.fu_berlin.agdb.ems.loader.ILoader;
 public class SourceParser implements Processor {
 
 	public static final String LOADER_PACKAGE = "de.fu_berlin.agdb.ems.loader";
-	public static final String IMPORTER_PACKAGE = "de.fu_berlin.agdb.ems.importer";
+	public static final String INPUT_ADAPTER_PACKAGE = "de.fu_berlin.agdb.ems.inputadapters";
 	public static final String LOADER_PREFIX = "loader";
-	public static final String IMPORTER_PREFIX = "importer";
+	public static final String INPUT_ADAPTER_PREFIX = "inputAdapter";
 	
 	private static Logger logger = LogManager.getLogger();
 	
-	// Stores the declarations of the constructors of all loader and importer classes
+	// Stores the declarations of the constructors of all loader and input adapter classes
 	// The map stores a list of constructor declarations for the class name (in the String).
 	// The second list contains all tags of a declaration.
 	private Map<String, List<List<String>>> loaderParameters;
-	private Map<String, List<List<String>>> importerParameters;
+	private Map<String, List<List<String>>> inputAdapterParameters;
 	
 	/**
 	 * Loads the source parser.
@@ -59,7 +59,7 @@ public class SourceParser implements Processor {
 	}
 	
 	/**
-	 * Generate parameter lists of all constructors of all loaders and importers.
+	 * Generate parameter lists of all constructors of all loaders and inputAdapters.
 	 */
 	private void generateParameters() {
 
@@ -71,13 +71,13 @@ public class SourceParser implements Processor {
 		}
 		logger.info("Found the following loader plugins: " + loaderParameters.keySet());
 		
-		// then for importers in the importer package
-		this.importerParameters = new Hashtable<String, List<List<String>>>();
-		List<Class<?>> importers = this.findClasses(IImporter.class, IMPORTER_PACKAGE);
-		for (Class<?> curLoader : importers) {
-			this.importerParameters.put(curLoader.getSimpleName(), this.classParameters(curLoader));
+		// then for input adapters in the input adapter package
+		this.inputAdapterParameters = new Hashtable<String, List<List<String>>>();
+		List<Class<?>> inputAdapters = this.findClasses(IInputAdapter.class, INPUT_ADAPTER_PACKAGE);
+		for (Class<?> curInputAdapter : inputAdapters) {
+			this.inputAdapterParameters.put(curInputAdapter.getSimpleName(), this.classParameters(curInputAdapter));
 		}
-		logger.info("Found the following importer plugins: " + importerParameters.keySet());
+		logger.info("Found the following input adapter plugins: " + inputAdapterParameters.keySet());
 	}
 	
 	/**
@@ -164,7 +164,7 @@ public class SourceParser implements Processor {
 	 * @param className name of class that is instantiated (full package name).
 	 * @param parameters list of tags of parameters (in the right order).
 	 * @param prop property object where parameter values are stored.
-	 * @param prefix prefix of the importer / loader.
+	 * @param prefix prefix of the input adapter / loader.
 	 * @return instantiation of the class.
 	 */
 	public Object loadClass(String className, List<String> parameters, Properties prop, String prefix) {
@@ -216,7 +216,7 @@ public class SourceParser implements Processor {
 	 * Parses source definition.
 	 * @param source source definition.
 	 */
-	public IImporter parse(String source) {
+	public IInputAdapter parse(String source) {
 		
 		// all interests are "properties files"
 		Properties prop = new Properties();
@@ -245,40 +245,40 @@ public class SourceParser implements Processor {
 				}
 			}
 
-			// when no loader was found there's no need for parsing the importer
+			// when no loader was found there's no need for parsing the input adapter
 			if (loaderObject == null) {
 				logger.error("No matching loader declaration found! Not loading source.");
 				return null;
 			}
 			
-			// now the importer
-			IImporter importerObject = null;
-			String importer = prop.getProperty("importer");
-			List<List<String>> importerParameters = this.importerParameters.get(importer);
-			if (importerParameters == null) {
-				logger.error("Importer specified in source file could not be found! Not loading source.");
+			// now the input adapter
+			IInputAdapter inputAdapterObject = null;
+			String inputAdapter = prop.getProperty(INPUT_ADAPTER_PREFIX);
+			List<List<String>> inputAdapterParameters = this.inputAdapterParameters.get(inputAdapter);
+			if (inputAdapterParameters == null) {
+				logger.error("Input adapter specified in source file could not be found! Not loading source.");
 				return null;
 			}
 			
-			for (List<String> curParameters : importerParameters) {
+			for (List<String> curParameters : inputAdapterParameters) {
 				
-				if (equalsIgnoringOrder(curParameters, this.getPropertiesWithPrefix(IMPORTER_PREFIX, prop))) {
+				if (equalsIgnoringOrder(curParameters, this.getPropertiesWithPrefix(INPUT_ADAPTER_PREFIX, prop))) {
 			
-					importerObject = (IImporter) this.loadClass(IMPORTER_PACKAGE + "." + importer, curParameters, prop, IMPORTER_PREFIX);
-					break; // only first possible importer (shouldn't be more than one anyway)
+					inputAdapterObject = (IInputAdapter) this.loadClass(INPUT_ADAPTER_PACKAGE + "." + inputAdapter, curParameters, prop, INPUT_ADAPTER_PREFIX);
+					break; // only first possible input adapter (shouldn't be more than one anyway)
 				}
 			}
 			
-			if (importerObject != null) {
+			if (inputAdapterObject != null) {
 				logger.info("Loading source.");
 				loaderObject.load();
 				logger.info("Done.");
 				logger.info("Importing events.");
-				importerObject.load(loaderObject.getText());
+				inputAdapterObject.load(loaderObject.getText());
 				logger.info("Done.");
 			}
 			
-			return importerObject;
+			return inputAdapterObject;
 		} catch (UnsupportedEncodingException e) {
 			// shouldn't happen because all internal encoding is done in UTF-8
 			logger.error(e);
@@ -315,14 +315,14 @@ public class SourceParser implements Processor {
 		
 		logger.info("Source file loaded.");
 		
-		// first parse the message and find out loader and importer
-		IImporter importer = this.parse(exchange.getIn().getBody(String.class));
-		if (importer == null)
+		// first parse the message and find out loader and input adapter
+		IInputAdapter inputAdapter = this.parse(exchange.getIn().getBody(String.class));
+		if (inputAdapter == null)
 			return;
 		
 		// then send messages into the queue
 		ProducerTemplate template = exchange.getContext().createProducerTemplate();
-		for (IEvent curEvent : importer.getEvents()) {
+		for (IEvent curEvent : inputAdapter.getEvents()) {
 			template.sendBody("ems-jms:queue:main.queue", curEvent);
 		}
 	}
@@ -331,12 +331,12 @@ public class SourceParser implements Processor {
 		
 		logger.info("Source file loaded.");
 		
-		// first parse the message and find out loader and importer
-		IImporter importer = this.parse(body);
-		if (importer == null)
+		// first parse the message and find out loader and input adapter
+		IInputAdapter inputAdapter = this.parse(body);
+		if (inputAdapter == null)
 			return null;
 		
-		return importer.getEvents();
+		return inputAdapter.getEvents();
 	}
 	
 	/**

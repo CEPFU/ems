@@ -3,6 +3,7 @@
  */
 package de.fu_berlin.agdb.ems.algebra.notifications;
 
+import de.fu_berlin.agdb.ems.algebra.Algebra;
 import de.fu_berlin.agdb.ems.algebra.Operator;
 
 
@@ -32,5 +33,11 @@ public class VerboseNotification implements Notification {
 
 	public void setRule(Operator rule) {
 		this.rule = rule;
+	}
+
+	@Override
+	public void setAlgebra(Algebra algebra) {
+		// TODO Auto-generated method stub
+		
 	}
 }

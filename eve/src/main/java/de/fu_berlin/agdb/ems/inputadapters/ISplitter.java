@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.agdb.ems.importer;
+package de.fu_berlin.agdb.ems.inputadapters;
 
 import java.util.List;
 

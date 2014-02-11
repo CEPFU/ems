@@ -1,4 +1,4 @@
-package de.fu_berlin.agdb.ems.importer;
+package de.fu_berlin.agdb.ems.inputadapters;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,11 +28,11 @@ import de.fu_berlin.agdb.ems.data.IAttribute;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
- * Importer for RSS feeds. Turns RSS xml files into RSSEvents.
+ * InputAdapter for RSS feeds. Turns RSS xml files into RSSEvents.
  * @author Ralf Oechsner
  *
  */
-public class RSSImporter implements IImporter {
+public class RSSInputAdapter implements IInputAdapter {
 
 
 	private List<IEvent> events;
@@ -41,7 +41,7 @@ public class RSSImporter implements IImporter {
 	 * Construct RSSEvents from XML-Text.
 	 * @param xmlText XML-Text.
 	 */
-	public RSSImporter() {
+	public RSSInputAdapter() {
 
 		this.events = new ArrayList<IEvent>();
 	}

@@ -11,10 +11,16 @@ import java.util.Map;
 public interface IEvent {
 
 	/**
-	 * Timestamp of event.
-	 * @return timestamp of event.
+	 * Time stamp of event.
+	 * @return time stamp of event.
 	 */
 	public Date getTimeStamp();
+	
+	/**
+	 * Set time stamp of event.
+	 * @param timeStamp time stamp of event
+	 */
+	public void setTimeStamp(Date timeStamp);
 	
 	/**
 	 * Map that contains all attributes of an event. Every attribute has a name

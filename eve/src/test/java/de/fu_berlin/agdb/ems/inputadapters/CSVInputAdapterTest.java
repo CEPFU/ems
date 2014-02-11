@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.agdb.ems.importer;
+package de.fu_berlin.agdb.ems.inputadapters;
 
 import static org.junit.Assert.assertTrue;
 
@@ -19,15 +19,15 @@ import org.junit.Test;
 import de.fu_berlin.agdb.ems.data.Attribute;
 import de.fu_berlin.agdb.ems.data.Event;
 import de.fu_berlin.agdb.ems.data.IAttribute;
-import de.fu_berlin.agdb.ems.importer.CSVImporter;
-import de.fu_berlin.agdb.ems.importer.IImporter;
+import de.fu_berlin.agdb.ems.inputadapters.CSVInputAdapter;
+import de.fu_berlin.agdb.ems.inputadapters.IInputAdapter;
 
 /**
- * Test for the CSVImporter.
+ * Test for the CSVInputAdapter.
  * @author Ralf Oechsner
  *
  */
-public class CSVImporterTest {
+public class CSVInputAdapterTest {
 
 	private List<Event> testEvents;
 	private String timeStampFormat;
@@ -55,13 +55,13 @@ public class CSVImporterTest {
 	
 	/**
 	 * Compares hard coded events to imported events.
-	 * @param importer importer.
+	 * @param inputAdapter inputAdapter.
 	 */
-	private void compare(IImporter importer) {
+	private void compare(IInputAdapter inputAdapter) {
 		
 		for (int i = 0; i < this.testEvents.size(); i++) {
 
-			assertTrue(this.testEvents.get(i).equals(importer.getEvents().get(i)));
+			assertTrue(this.testEvents.get(i).equals(inputAdapter.getEvents().get(i)));
 		}
 	}
 	
@@ -87,10 +87,10 @@ public class CSVImporterTest {
 				"Sat Dec 29 14:02:12 CET 2012;33;66\n" + 
 				"Sun Dec 30 17:12:23 CET 2012;-2;5";
 		
-		CSVImporter importer = new CSVImporter("Time", this.timeStampFormat, ";");
-		importer.load(text);
+		CSVInputAdapter inputAdapter = new CSVInputAdapter("Time", this.timeStampFormat, ";");
+		inputAdapter.load(text);
 		
-		this.compare(importer);
+		this.compare(inputAdapter);
 	}
 	
 	@Test
@@ -102,10 +102,10 @@ public class CSVImporterTest {
 				"Sat Dec 29 14:02:12 CET 2012,33,66\n" + 
 				"Sun Dec 30 17:12:23 CET 2012,-2,5";
 		
-		CSVImporter importer = new CSVImporter("Time", this.timeStampFormat, ",");
-		importer.load(text);
+		CSVInputAdapter inputAdapter = new CSVInputAdapter("Time", this.timeStampFormat, ",");
+		inputAdapter.load(text);
 		
-		this.compare(importer);
+		this.compare(inputAdapter);
 	}
 	
 	@Test
@@ -117,9 +117,9 @@ public class CSVImporterTest {
 				"33;Sat Dec 29 14:02:12 CET 2012;66\n" + 
 				"-2;Sun Dec 30 17:12:23 CET 2012;5";
 		
-		CSVImporter importer = new CSVImporter("Time", this.timeStampFormat, ";");
-		importer.load(text);
+		CSVInputAdapter inputAdapter = new CSVInputAdapter("Time", this.timeStampFormat, ";");
+		inputAdapter.load(text);
 		
-		this.compare(importer);
+		this.compare(inputAdapter);
 	}
 }

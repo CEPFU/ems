@@ -7,6 +7,7 @@ import de.fu_berlin.agdb.ems.algebra.notifications.Notification;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
+ * Defines a profile (user interest) in the rule system (algebra).
  * @author Ralf Oechsner
  *
  */
@@ -14,7 +15,7 @@ public class Profile {
 
 	private Operator rule;
 	private Notification[] notifications;
-	
+
 	public Profile(Operator rule, Notification notification) {
 		
 		this.rule = rule;
@@ -36,9 +37,25 @@ public class Profile {
 	public void apply(IEvent event) throws OperatorNotSupportedException {
 		
 		if (this.rule.apply(event)) {
+			
+			// and reset matches so that rule only fires once (important!)
+			// it's also important to reset it before throwing the notification
+			// because otherwise it will result in an endless loop
+			this.rule.reset();
+						
+			// throw notifications
 			for (Notification curNotification : notifications) {
 				curNotification.apply();
 			}
 		}
+	}
+
+	/**
+	 * Getter for notifications
+	 * @return notifications
+	 */
+	public Notification[] getNotifications() {
+		
+		return notifications;
 	}
 }

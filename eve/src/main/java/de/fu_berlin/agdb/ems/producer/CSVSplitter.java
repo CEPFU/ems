@@ -6,7 +6,7 @@ package de.fu_berlin.agdb.ems.producer;
 import java.util.List;
 
 import de.fu_berlin.agdb.ems.data.IEvent;
-import de.fu_berlin.agdb.ems.importer.CSVImporter;
+import de.fu_berlin.agdb.ems.inputadapters.CSVInputAdapter;
 
 
 /**
@@ -21,7 +21,7 @@ public class CSVSplitter {
 
 	public List<IEvent> split(String body) {
 		
-		CSVImporter importer = new CSVImporter("Time", "EEE MMM dd HH:mm:ss z YYYY", ";");
+		CSVInputAdapter importer = new CSVInputAdapter("Time", "EEE MMM dd HH:mm:ss z YYYY", ";");
 		importer.load(body);
 		
 		return importer.getEvents();

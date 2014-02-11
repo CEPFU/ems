@@ -4,10 +4,11 @@
 package de.fu_berlin.agdb.ems.data;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Event structure for RSS feeds.
+ * Event structure for all events.
  * @author Ralf Oechsner
  *
  */
@@ -24,14 +25,27 @@ public class Event implements IEvent {
 	}
 	
 	/**
-	 * Create RSSEvent with timestamp and attributes.
-	 * @param timestamp timestamp of event.
+	 * Create event with time stamp and attributes.
+	 * @param timestamp time stamp of event.
 	 * @param attributes attribute map of event.
 	 */
 	public Event(Date timestamp, Map<String, IAttribute> attributes) {
 		
 		this.timeStamp = timestamp;
 		this.attributes = attributes;
+	}
+	
+	/**
+	 * Creates an event with one attribute and it's value. Time stamp is set to the current
+	 * time.
+	 * @param attribute attribute of event
+	 * @param attributeValue value of the attribute
+	 */
+	public Event(String attribute, Object attributeValue) {
+		
+		this.timeStamp = new Date();  // current time in miliseconds
+		this.attributes = new HashMap<String, IAttribute>();
+		this.attributes.put(attribute, new Attribute(attributeValue));
 	}
 	
 	/* (non-Javadoc)
@@ -42,10 +56,10 @@ public class Event implements IEvent {
 		return this.timeStamp;
 	}
 	
-	/**
-	 * Setter for timestamp.
-	 * @param timeStamp timestamp.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.agdb.ems.data.IEvent#setTimeStamp(java.util.Date)
 	 */
+	@Override
 	public void setTimeStamp(Date timeStamp) {
 		
 		this.timeStamp = timeStamp;
@@ -116,6 +130,4 @@ public class Event implements IEvent {
 			return false;
 		return true;
 	}	
-	
-	
 }

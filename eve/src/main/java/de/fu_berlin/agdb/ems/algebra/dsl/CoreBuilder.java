@@ -4,7 +4,6 @@
 package de.fu_berlin.agdb.ems.algebra.dsl;
 
 import de.fu_berlin.agdb.ems.algebra.Operator;
-import de.fu_berlin.agdb.ems.data.IAttribute;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
@@ -16,21 +15,34 @@ public class CoreBuilder {
 	public static Operator attribute(final String key) {
 		
 		return new Operator() {
-
-			IAttribute matchingAttribute = null;
+			
+			private IEvent[] matchingEvents = new IEvent[1];
 			
 			@Override
 			public boolean apply(IEvent event) {
 				
-				this.matchingAttribute = event.getAttributes().get(key);
+				if (event.getAttributes().containsKey(key))
+					this.matchingEvents[0] = event;
 				
-				return this.matchingAttribute != null;
+				return this.matchingEvents[0] != null;
 			}
 			
 			@Override
 	        public String toString(){
 	            return "attribute(" + key + ")";
-	        } 
+	        }
+
+			@Override
+			public IEvent[] getMatchingEvents() {
+
+				return this.matchingEvents;
+			}
+
+			@Override
+			public void reset() {
+
+				this.matchingEvents[0] = null;
+			}
 		};
 	}
 }
