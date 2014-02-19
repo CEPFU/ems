@@ -22,6 +22,7 @@ public class Configuration {
 	private static Logger logger = LogManager.getLogger();
 	private Properties properties;
 	private String sourcesFolder = "sources";
+	private String profilesFolder = "profiles";
 	
 	/**
 	 * Main configuration.
@@ -33,18 +34,14 @@ public class Configuration {
 
 	/**
 	 * Load configuration from disk.
-	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void load() throws FileNotFoundException {
+	public void load() throws IOException {
 		
-		 try {
-			properties.load(new FileInputStream(CONFIG_PATH));
-			 this.sourcesFolder = properties.getProperty("sourcesfolder");
-			 logger.info("Configuration file " + CONFIG_PATH + " loaded.");
-		} catch (IOException e) {
-			logger.error("Configuration file cannot be loaded!", e);
-		}
+		properties.load(new FileInputStream(CONFIG_PATH));
+		this.sourcesFolder = properties.getProperty("sourcesfolder");
+		this.profilesFolder = properties.getProperty("profilesfolder");
+		logger.info("Configuration file " + CONFIG_PATH + " loaded.");
 	}
 	
 	/**
@@ -55,6 +52,7 @@ public class Configuration {
 	public void save() throws FileNotFoundException {
 		
 		properties.setProperty("sourcesfolder", sourcesFolder);
+		properties.setProperty("profilesfolder", profilesFolder);
 		
 		try {
 			properties.store(new FileOutputStream("config/main.properties"), "Main Configuration");
@@ -71,7 +69,7 @@ public class Configuration {
 		
 		try {
 			this.load(); // loads configuration with default values
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			try {
 				// save default configuration if no configuration file exists
 				this.save();
@@ -96,5 +94,23 @@ public class Configuration {
 	 */
 	public void setSourcesFolder(String sourcesFolder) {
 		this.sourcesFolder = sourcesFolder;
+	}
+
+	
+	/**
+	 * Returns path of profile files.
+	 * @return path of profile folder
+	 */
+	public String getProfilesFolder() {
+		return profilesFolder;
+	}
+
+	
+	/**
+	 * Sets path to profile folder.
+	 * @param profilesFolder path to profile folder
+	 */
+	public void setProfilesFolder(String profilesFolder) {
+		this.profilesFolder = profilesFolder;
 	}
 }

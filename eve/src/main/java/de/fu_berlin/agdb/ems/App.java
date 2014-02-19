@@ -21,6 +21,7 @@ import de.fu_berlin.agdb.ems.algebra.Algebra;
 import de.fu_berlin.agdb.ems.algebra.Profile;
 import de.fu_berlin.agdb.ems.algebra.notifications.CompositeEventNotification;
 import de.fu_berlin.agdb.ems.core.Configuration;
+import de.fu_berlin.agdb.ems.core.ProfileLoader;
 import de.fu_berlin.agdb.ems.core.SourceParser;
 import de.fu_berlin.agdb.ems.data.Attribute;
 import de.fu_berlin.agdb.ems.data.Event;
@@ -55,12 +56,15 @@ public class App {
 			
 			final Algebra algebra = new Algebra(camelContext);
 			
-			Map<String, IAttribute> attributes1 = new Hashtable<String, IAttribute>();
-			attributes1.put("Humidity", new Attribute(new Integer(25)));
-			Event event1 = new Event(new Date(), attributes1);
-			algebra.addProfile(new Profile(and(attribute("Temperature"), attribute("Humidity")), new CompositeEventNotification(new Event("description", "SEND CEP"))));
+//			Map<String, IAttribute> attributes1 = new Hashtable<String, IAttribute>();
+//			attributes1.put("Humidity", new Attribute(new Integer(25)));
+//			Event event1 = new Event(new Date(), attributes1);
+//			algebra.addProfile(new Profile(and(attribute("Temperature"), attribute("Humidity")), new CompositeEventNotification(new Event("description", "SEND CEP"))));
+//			
+			final ProfileLoader profileLoader = new ProfileLoader(algebra);
+			profileLoader.setProfilesFolder(mainConfiguration.getProfilesFolder());
 			
-			// this route loads source files from disk and process them via the InterestParser
+			// this route loads source files from disk and process them via the SourceParser
 			camelContext.addRoutes(new RouteBuilder() {
 			    public void configure() {
 			    	// source files are moved to "inprogress" during processing and to "done" after processing
@@ -76,6 +80,17 @@ public class App {
 			camelContext.addRoutes(new RouteBuilder() {
 			    public void configure() {
 					from(Algebra.EVENT_QUEUE_URI).to("ems-jms:queue:main.queue").process(algebra);
+			    }
+			});
+			
+			// this route loads profile files from disk and process them via the ProfileLoader
+			camelContext.addRoutes(new RouteBuilder() {
+			    public void configure() {
+					from(
+							"file://"
+									+ mainConfiguration.getProfilesFolder()
+									+ "?noop=true")
+							.process(profileLoader);
 			    }
 			});
 			

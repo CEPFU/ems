@@ -3,6 +3,7 @@
  */
 package de.fu_berlin.agdb.ems.algebra.notifications;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +39,6 @@ public class CompositeEventNotification implements Notification {
 			this.compositeEvents[i] = events[i];
 		}
 	}
-	
 	
 	/* (non-Javadoc)
 	 * @see de.fu_berlin.agdb.ems.algebra.notifications.Notification#apply()
@@ -87,4 +87,9 @@ public class CompositeEventNotification implements Notification {
 		this.algebra = algebra;
 	}
 
+	@Override
+	public String toString() {
+		return "CompositeEventNotification [compositeEvents="
+				+ Arrays.toString(compositeEvents) + "]";
+	}
 }

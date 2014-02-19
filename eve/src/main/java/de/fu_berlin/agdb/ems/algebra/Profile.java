@@ -3,6 +3,8 @@
  */
 package de.fu_berlin.agdb.ems.algebra;
 
+import java.util.Arrays;
+
 import de.fu_berlin.agdb.ems.algebra.notifications.Notification;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
@@ -24,7 +26,7 @@ public class Profile {
 		this.notifications[0].setRule(rule);
 	}
 	
-	public Profile(Operator rule, Notification[] notifications) {
+	public Profile(Operator rule, Notification ... notifications) {
 	
 		this.rule = rule;
 		this.notifications = notifications;
@@ -57,5 +59,11 @@ public class Profile {
 	public Notification[] getNotifications() {
 		
 		return notifications;
+	}
+
+	@Override
+	public String toString() {
+		return "Profile [rule=" + rule + ", notifications="
+				+ Arrays.toString(notifications) + "]";
 	}
 }
