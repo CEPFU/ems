@@ -1,5 +1,7 @@
 package de.fu_berlin.agdb.ems.inputadapters;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.fu_berlin.agdb.ems.core.Tag;
 import de.fu_berlin.agdb.ems.data.Attribute;
@@ -21,29 +26,60 @@ import de.fu_berlin.agdb.ems.data.IEvent;
  * @author Ralf Oechsner
  *
  */
-public class CSVInputAdapter implements IInputAdapter, ISplitter {
+public class CSVInputAdapter implements IInputAdapter {
 
 	private List<IEvent> events;
 	private String timeStampCaption;
 	private String timeStampFormat;
-	private String separator;
+	private String delimiter;
+	private Constructor<?>[] columnTypes = null;
+	
+	private static Logger logger = LogManager.getLogger();
 	
 	/**
 	 * InputAdapter for CSV files.
 	 * @param csvText text of CSV file. First line must contain captions of columns.
 	 * @param timeStampCaption caption of time stamp column (case sensitive!).
 	 * @param timeStampFormat format string of time stamp (see java.text.SimpleDateFormat).
-	 * @param separator separator of columns (e.g. "," or ";" or "\t").
+	 * @param delimter delimiter of columns (e.g. "," or ";" or "\t").
 	 */
-	public CSVInputAdapter(@Tag("timeStampCaption") String timeStampCaption, @Tag("timeStampFormat") String timeStampFormat, @Tag("separator") String separator) {
+	public CSVInputAdapter(@Tag("timeStampCaption") String timeStampCaption, @Tag("timeStampFormat") String timeStampFormat, @Tag("delimiter") String delimiter) {
 
 		this.timeStampCaption = timeStampCaption;
 		this.timeStampFormat = timeStampFormat;
-		this.separator = separator;
+		this.delimiter = delimiter;
 		this.events = new ArrayList<IEvent>();
 	}
 	
-	
+	/**
+	 * 
+	 * @param timeStampCaption
+	 * @param timeStampFormat
+	 * @param delimiter
+	 * @param columnTypes
+	 */
+	public CSVInputAdapter(@Tag("timeStampCaption") String timeStampCaption, @Tag("timeStampFormat") String timeStampFormat, @Tag("delimiter") String delimiter, @Tag("columnTypes") String columnTypes) {
+
+		this(timeStampCaption, timeStampFormat, delimiter);
+		String[] types = columnTypes.split("\\s*,\\s*");
+		this.columnTypes = new Constructor<?>[types.length];
+		int i = 0;
+		for (String curType : types) {
+			
+			try {
+				Class<?> cl = Class.forName(curType);
+				this.columnTypes[i] = cl.getConstructor(String.class);
+			} catch (NoSuchMethodException e) {
+				logger.debug("CSVInputAdapter: Type of column " + i + " has no constructor with String as parameter! Falling back to type String.");
+			} catch (SecurityException e) {
+				// TODO: when does this happen?
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				logger.debug("CSVInputAdapter: Type of column " + i + " cannot be found! Falling back to type String.");
+			}
+			i++;
+		}
+	}
 	
 	/**
 	 * Parses the CSV file.
@@ -60,7 +96,7 @@ public class CSVInputAdapter implements IInputAdapter, ISplitter {
 		
 		// first line is stored as a list which is used for keys
 		String line = scanner.nextLine();
-		StringTokenizer st = new StringTokenizer(line, this.separator);
+		StringTokenizer st = new StringTokenizer(line, this.delimiter);
 		List<String> keys = new ArrayList<String>();
 		int timeStampCol = 0;
 		int col = 0;
@@ -82,19 +118,40 @@ public class CSVInputAdapter implements IInputAdapter, ISplitter {
 		// parse every line and look for attributes
 		while (scanner.hasNextLine()) {
 			
-			
 			Event curEvent = new Event();
 			Map<String, IAttribute> curAttributes = new HashMap<String, IAttribute>();
 			
 			line = scanner.nextLine();
 
-			st = new StringTokenizer(line, this.separator);
+			st = new StringTokenizer(line, this.delimiter);
 			col = 0;
 			while(st.hasMoreTokens()) {
+			
 				String token = st.nextToken();
 				// normal attribute
 				if (col != timeStampCol) {
-					curAttributes.put(keys.get(col), new Attribute(token));
+					
+					// convert to columnType (defined in a tag) otherwise fall back to String
+					if (this.columnTypes != null && this.columnTypes.length > 0 && this.columnTypes[col] != null) {
+						try {
+							curAttributes.put(keys.get(col), new Attribute(this.columnTypes[col].newInstance(token)));
+						} catch (InstantiationException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IllegalArgumentException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (InvocationTargetException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else {
+						curAttributes.put(keys.get(col), new Attribute(token));
+					}
 				}
 				// time stamp
 				else {
@@ -119,14 +176,6 @@ public class CSVInputAdapter implements IInputAdapter, ISplitter {
 	
 	public List<IEvent> getEvents() {
 
-		return this.events;
-	}
-
-	@Override
-	public List<IEvent> splitMessage(String header, String body) {
-
-		this.parseCSV(body);
-		
 		return this.events;
 	}
 

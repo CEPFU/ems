@@ -1,12 +1,5 @@
 package de.fu_berlin.agdb.ems;
 
-import static de.fu_berlin.agdb.ems.algebra.dsl.CoreBuilder.attribute;
-import static de.fu_berlin.agdb.ems.algebra.dsl.LogicOperatorBuilder.and;
-
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Map;
-
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -18,14 +11,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.fu_berlin.agdb.ems.algebra.Algebra;
-import de.fu_berlin.agdb.ems.algebra.Profile;
-import de.fu_berlin.agdb.ems.algebra.notifications.CompositeEventNotification;
 import de.fu_berlin.agdb.ems.core.Configuration;
 import de.fu_berlin.agdb.ems.core.ProfileLoader;
 import de.fu_berlin.agdb.ems.core.SourceParser;
-import de.fu_berlin.agdb.ems.data.Attribute;
-import de.fu_berlin.agdb.ems.data.Event;
-import de.fu_berlin.agdb.ems.data.IAttribute;
 
 /**
  * Main routine of backend.
@@ -56,11 +44,6 @@ public class App {
 			
 			final Algebra algebra = new Algebra(camelContext);
 			
-//			Map<String, IAttribute> attributes1 = new Hashtable<String, IAttribute>();
-//			attributes1.put("Humidity", new Attribute(new Integer(25)));
-//			Event event1 = new Event(new Date(), attributes1);
-//			algebra.addProfile(new Profile(and(attribute("Temperature"), attribute("Humidity")), new CompositeEventNotification(new Event("description", "SEND CEP"))));
-//			
 			final ProfileLoader profileLoader = new ProfileLoader(algebra);
 			profileLoader.setProfilesFolder(mainConfiguration.getProfilesFolder());
 			

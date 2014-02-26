@@ -7,6 +7,7 @@ import de.fu_berlin.agdb.ems.algebra.Algebra;
 import de.fu_berlin.agdb.ems.algebra.Operator;
 
 /**
+ * Interface for notifications.
  * @author Ralf Oechsner
  *
  */

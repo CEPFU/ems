@@ -43,7 +43,7 @@ public class Event implements IEvent {
 	 */
 	public Event(String attribute, Object attributeValue) {
 		
-		this.timeStamp = new Date();  // current time in miliseconds
+		this.timeStamp = new Date();  // current time in milliseconds
 		this.attributes = new HashMap<String, IAttribute>();
 		this.attributes.put(attribute, new Attribute(attributeValue));
 	}

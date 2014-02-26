@@ -4,7 +4,6 @@
 package de.fu_berlin.agdb.ems.algebra;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -65,23 +64,15 @@ public class Algebra implements Processor {
 		this.history.add(event);
 		
 		// process all profiles
-		Iterator<Profile> iter = this.profiles.iterator();
-		while (iter.hasNext()) {
-			
-			Profile curProfile = iter.next();
+		for (Profile curProfile : this.profiles) {
+
 			try {
 				curProfile.apply(event);
 			} catch(OperatorNotSupportedException e) {
-				// TODO: check if that's really the case
-				// profile with a rule that has operators in it that
-				// aren't supported are removed
-				iter.remove();
+				// no action required
+				logger.debug("Operator not supported: " + e.getMessage());
 			}
 		}
-//		for (Profile curProfile : this.profiles) {
-//			// TODO loeschen bei exception
-//			curProfile.apply(event);
-//		}
 	}
 	
 	/**
