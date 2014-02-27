@@ -4,8 +4,10 @@
 package de.fu_berlin.agdb.ems.algebra.dsl;
 
 import de.fu_berlin.agdb.ems.algebra.Operator;
-import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
-import de.fu_berlin.agdb.ems.data.IEvent;
+import de.fu_berlin.agdb.ems.algebra.operators.logic.And;
+import de.fu_berlin.agdb.ems.algebra.operators.logic.Not;
+import de.fu_berlin.agdb.ems.algebra.operators.logic.Or;
+import de.fu_berlin.agdb.ems.algebra.operators.logic.Xor;
 
 /**
  * Logic Operators.
@@ -14,118 +16,46 @@ import de.fu_berlin.agdb.ems.data.IEvent;
  */
 public class LogicOperatorBuilder {
 
-	
-	public static Operator and(final Operator op1, final Operator op2) {
+	/**
+	 * Boolean and operator.
+	 * @param op1 first operator
+	 * @param op2 second operator
+	 * @return and operator
+	 */
+	public static Operator and(Operator op1, Operator op2) {
 		
-		return new Operator() {
-			
-			private IEvent[] matchingEvents = new IEvent[2];
-			
-			public boolean apply(IEvent event) throws OperatorNotSupportedException {
-				return op1.apply(event) && op2.apply(event);
-			}
-			
-			@Override
-	        public String toString(){
-	            return "and(" + op1 + ", " + op2 + ")";
-	        }
-
-			@Override
-			public IEvent[] getMatchingEvents() {
-				
-				// TODO: implement
-				return null;
-			}
-
-			@Override
-			public void reset() {
-
-				op1.reset();
-				op2.reset();
-			}
-		};
+		return new And(op1, op2);
 	}
 	
+	/**
+	 * Boolean or operator.
+	 * @param op1 first operator
+	 * @param op2 second operator
+	 * @return or operator
+	 */
 	public static Operator or(final Operator op1, final Operator op2) {
 		
-		return new Operator() {
-			
-			public boolean apply(IEvent event) throws OperatorNotSupportedException {
-				return op1.apply(event) || op2.apply(event);
-			}
-			
-			@Override
-	        public String toString(){
-	            return "or(" + op1 + ", " + op2 + ")";
-	        }
-
-			@Override
-			public IEvent[] getMatchingEvents() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void reset() {
-
-				op1.reset();
-				op2.reset();
-			} 
-		};
+		return new Or(op1, op2);
 	}
 	
+	/**
+	 * Boolean xor operator.
+	 * @param op1 first operator
+	 * @param op2 second operator
+	 * @return xor operator
+	 */
 	public static Operator xor(final Operator op1, final Operator op2) {
 		
-		return new Operator() {
-			
-			public boolean apply(IEvent event) throws OperatorNotSupportedException {
-				return (op1.apply(event) || op2.apply(event)) && !(op1.apply(event) && op2.apply(event));
-			}
-			
-			@Override
-	        public String toString(){
-	            return "xor(" + op1 + ", " + op2 + ")";
-	        }
-
-			@Override
-			public IEvent[] getMatchingEvents() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void reset() {
-
-				op1.reset();
-				op2.reset();
-			} 
-		};
+		return new Xor(op1, op2);
 	}
 	
+	/**
+	 * Boolean not operator.
+	 * @param op operator that is negated
+	 * @return not operator
+	 */
 	public static Operator not(final Operator op) {
 		
-		return new Operator() {
-			
-			public boolean apply(IEvent event) throws OperatorNotSupportedException {
-				return !op.apply(event);
-			}
-			
-			@Override
-	        public String toString(){
-	            return "not(" + op + ")";
-	        }
-
-			@Override
-			public IEvent[] getMatchingEvents() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void reset() {
-
-				op.reset();
-			} 
-		};
+		return new Not(op);
 	}
 }
