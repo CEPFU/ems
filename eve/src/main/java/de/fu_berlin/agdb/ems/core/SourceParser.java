@@ -12,6 +12,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,6 +45,9 @@ public class SourceParser implements Processor {
 	
 	private static Logger logger = LogManager.getLogger();
 	
+	private URL loaderPath;
+	private URL inputAdapterPath;
+	
 	// Stores the declarations of the constructors of all loader and input adapter classes
 	// The map stores a list of constructor declarations for the class name (in the String).
 	// The second list contains all tags of a declaration.
@@ -54,7 +58,16 @@ public class SourceParser implements Processor {
 	 * Loads the source parser.
 	 */
 	public SourceParser() {
-
+		
+		this.loaderPath = Thread.currentThread().getContextClassLoader().getResource(LOADER_PACKAGE.replace(".", "/"));
+		this.inputAdapterPath = Thread.currentThread().getContextClassLoader().getResource(INPUT_ADAPTER_PACKAGE.replace(".", "/"));
+		this.generateParameters();
+	}
+	
+	public SourceParser(URL loaderPath, URL inputAdapterPath) {
+		
+		this.loaderPath = loaderPath;
+		this.inputAdapterPath = inputAdapterPath;
 		this.generateParameters();
 	}
 	
@@ -65,7 +78,7 @@ public class SourceParser implements Processor {
 
 		// first look for loaders in the loader package
 		this.loaderParameters = new Hashtable<String, List<List<String>>>();
-		List<Class<?>> loaders = this.findClasses(ILoader.class, LOADER_PACKAGE);
+		List<Class<?>> loaders = this.findClasses(ILoader.class, loaderPath, LOADER_PACKAGE);
 		for (Class<?> curLoader : loaders) {
 			this.loaderParameters.put(curLoader.getSimpleName(), this.classParameters(curLoader));
 		}
@@ -73,7 +86,7 @@ public class SourceParser implements Processor {
 		
 		// then for input adapters in the input adapter package
 		this.inputAdapterParameters = new Hashtable<String, List<List<String>>>();
-		List<Class<?>> inputAdapters = this.findClasses(IInputAdapter.class, INPUT_ADAPTER_PACKAGE);
+		List<Class<?>> inputAdapters = this.findClasses(IInputAdapter.class, inputAdapterPath, INPUT_ADAPTER_PACKAGE);
 		for (Class<?> curInputAdapter : inputAdapters) {
 			this.inputAdapterParameters.put(curInputAdapter.getSimpleName(), this.classParameters(curInputAdapter));
 		}
@@ -83,18 +96,20 @@ public class SourceParser implements Processor {
 	/**
 	 * Find all classes in a given package that implement a given interface.
 	 * @param interfaceImplemented interface classes have implement.
+	 * @param classPath path to classes.
 	 * @param packageName package name of classes.
 	 * @return list of classes in the package that implement the interface.
 	 */
-	private List<Class<?>> findClasses(Class<?> interfaceImplemented, String packageName) {
+	private List<Class<?>> findClasses(Class<?> interfaceImplemented, URL classPath, String packageName) {
 		
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		URL root = Thread.currentThread().getContextClassLoader().getResource(packageName.replace(".", "/"));
+		//URL root = Thread.currentThread().getContextClassLoader().getResource(packageName.replace(".", "/"));
+		URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { classPath });
 
 		// filter .class files.
 		File[] files;
 		try {
-			files = new File(URLDecoder.decode(root.getFile(), "UTF-8")).listFiles(new FilenameFilter() {
+			files = new File(URLDecoder.decode(classPath.getFile(), "UTF-8")).listFiles(new FilenameFilter() {
 			    public boolean accept(File dir, String name) {
 			        return name.endsWith(".class");
 			    }
@@ -105,7 +120,8 @@ public class SourceParser implements Processor {
 			    String className = file.getName().replaceAll(".class$", "");
 			    Class<?> cls;
 				try {
-					cls = Class.forName(packageName + "." + className);
+					cls = Class.forName(packageName + "." + className, true, classLoader);
+//					cls = Class.forName(className, true, classLoader);
 					if (!cls.isInterface()) {
 						if (interfaceImplemented.isAssignableFrom(cls)) {
 							classes.add((Class<?>) cls);
@@ -339,6 +355,34 @@ public class SourceParser implements Processor {
 		return inputAdapter.getEvents();
 	}
 	
+	/**
+	 * @return the loaderPath
+	 */
+	public URL getLoaderPath() {
+		return loaderPath;
+	}
+
+	/**
+	 * @param loaderPath the loaderPath to set
+	 */
+	public void setLoaderPath(URL loaderPath) {
+		this.loaderPath = loaderPath;
+	}
+
+	/**
+	 * @return the inputAdapterPath
+	 */
+	public URL getInputAdapterPath() {
+		return inputAdapterPath;
+	}
+
+	/**
+	 * @param inputAdapterPath the inputAdapterPath to set
+	 */
+	public void setInputAdapterPath(URL inputAdapterPath) {
+		this.inputAdapterPath = inputAdapterPath;
+	}
+
 	/**
 	 * Checks if two collections (e.g. lists) contain equal objects (ignoring the order). 
 	 * @param c1 first collection.

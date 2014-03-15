@@ -3,7 +3,7 @@
  */
 package de.fu_berlin.agdb.ems.algebra.operators.core;
 
-import de.fu_berlin.agdb.ems.algebra.Operator;
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
@@ -12,7 +12,7 @@ import de.fu_berlin.agdb.ems.data.IEvent;
  * @author Ralf Oechsner
  *
  */
-public class Attribute extends Operator {
+public class Attribute extends Match {
 
 	private String attribute;
 	
@@ -48,7 +48,7 @@ public class Attribute extends Operator {
 	@Override
     public String toString(){
 		
-        return "attribute(" + attribute + ")";
+        return "attribute(" + this.attribute + ")";
     }
 	
 	/* (non-Javadoc)

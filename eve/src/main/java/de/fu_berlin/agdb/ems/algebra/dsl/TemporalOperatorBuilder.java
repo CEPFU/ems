@@ -9,6 +9,7 @@ import de.fu_berlin.agdb.ems.algebra.Operator;
 import de.fu_berlin.agdb.ems.algebra.operators.temporal.After;
 import de.fu_berlin.agdb.ems.algebra.operators.temporal.Before;
 import de.fu_berlin.agdb.ems.algebra.operators.temporal.Concurrent;
+import de.fu_berlin.agdb.ems.algebra.operators.temporal.Sequence;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
@@ -59,6 +60,16 @@ public class TemporalOperatorBuilder {
 	}
 	
 	/**
+	 * after: True if event happens after event b.
+	 * @param b operator
+	 * @return true if event happens after time stamp b, false else
+	 */
+	public static Operator after(Operator b) {
+		
+		return new After(b);
+	}
+	
+	/**
 	 * concurrent: True if time stamp of event equals the one of event b.
 	 * @param b event b
 	 * @return true if time stamp of event equals the one of event b, false else
@@ -76,5 +87,10 @@ public class TemporalOperatorBuilder {
 	public static Operator concurrent(Date b) {
 		
 		return new Concurrent(b);
+	}
+	
+	public static Sequence sequence(Operator ... operators) {
+		
+		return new Sequence(operators);
 	}
 }

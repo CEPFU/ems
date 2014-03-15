@@ -56,7 +56,7 @@ public class CompositeEventNotification implements Notification {
 			curEvent.setTimeStamp(curTime);
 			
 			this.algebra.queueEvent(curEvent);
-			logger.debug("Sent event to queue: " + curEvent);
+			logger.info("Sent event to queue: " + curEvent);
 		}
 	}
 

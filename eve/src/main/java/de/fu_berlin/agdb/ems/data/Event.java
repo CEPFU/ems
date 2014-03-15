@@ -85,14 +85,18 @@ public class Event implements IEvent {
 	 * Returns string with time stamp and every attribute on a new line.
 	 * Every line has the form: Key: Value + newline.
 	 */
+	@Override
 	public String toString() {
 		
 		String nl = System.getProperty("line.separator");
 		String s = "Timestamp: " + this.timeStamp + nl;
 		
+		int i = 0;
 		for (Map.Entry<String, IAttribute> entry : this.attributes.entrySet()) {
 			
-			s += entry.getKey() + ": " + entry.getValue() + nl;
+			s += entry.getKey() + ": " + entry.getValue();
+			if (i++ != this.attributes.entrySet().size() - 1)
+				s += nl;
 		}
 		
 		return s;

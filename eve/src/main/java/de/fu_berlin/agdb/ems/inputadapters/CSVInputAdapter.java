@@ -60,7 +60,7 @@ public class CSVInputAdapter implements IInputAdapter {
 	 */
 	public CSVInputAdapter(@Tag("timeStampCaption") String timeStampCaption, @Tag("timeStampFormat") String timeStampFormat, @Tag("delimiter") String delimiter, @Tag("columnTypes") String columnTypes) {
 
-		this(timeStampCaption, timeStampFormat, delimiter);
+		this(timeStampCaption, timeStampFormat, delimiter);		
 		String[] types = columnTypes.split("\\s*,\\s*");
 		this.columnTypes = new Constructor<?>[types.length];
 		int i = 0;
@@ -155,6 +155,7 @@ public class CSVInputAdapter implements IInputAdapter {
 				}
 				// time stamp
 				else {
+
 					DateFormat df = new SimpleDateFormat(this.timeStampFormat);
 					try {
 						curEvent.setTimeStamp(df.parse(token));

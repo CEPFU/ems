@@ -5,6 +5,9 @@ package de.fu_berlin.agdb.ems.algebra;
 
 import java.util.Arrays;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.fu_berlin.agdb.ems.algebra.notifications.Notification;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
@@ -18,6 +21,8 @@ public class Profile {
 	private Operator rule;
 	private Notification[] notifications;
 
+	private static Logger logger = LogManager.getLogger();
+	
 	public Profile(Operator rule, Notification notification) {
 		
 		this.rule = rule;
@@ -39,7 +44,9 @@ public class Profile {
 	public void apply(IEvent event) throws OperatorNotSupportedException {
 		
 		if (this.rule.apply(event)) {
-				
+			
+			logger.info("Matching events: " + this.rule.matchToString());
+		
 			// and reset matches so that rule only fires once (important!)
 			// it's also important to reset it before throwing the notification
 			// because otherwise it will result in an endless loop

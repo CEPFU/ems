@@ -5,6 +5,7 @@ package de.fu_berlin.agdb.ems.algebra.operators.temporal;
 
 import java.util.Date;
 
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.Operator;
 import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.ems.data.IEvent;
@@ -14,9 +15,16 @@ import de.fu_berlin.agdb.ems.data.IEvent;
  * @author Ralf Oechsner
  *
  */
-public class After extends Operator {
+public class After extends Match {
 
 	private Date b;
+	private Operator op;
+	
+	public After(Operator op) {
+		
+		this.children = new Operator[1];
+		this.children[0] = op;
+	}
 	
 	/**
 	 * Temporal after operator.
@@ -44,6 +52,10 @@ public class After extends Operator {
 	@Override
 	public boolean apply(IEvent event) throws OperatorNotSupportedException {
 
+		if (op != null && op.getMatchingEvents() != null) {
+			this.b = op.getMatchingEvents()[0].getTimeStamp();
+		}
+		
 		boolean comparison = event.getTimeStamp().after(b);
 		
 		if (comparison) {

@@ -1,5 +1,7 @@
 package de.fu_berlin.agdb.ems;
 
+import java.io.File;
+
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -7,10 +9,12 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.commons.cli.CommandLine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.fu_berlin.agdb.ems.algebra.Algebra;
+import de.fu_berlin.agdb.ems.core.CommandLineParser;
 import de.fu_berlin.agdb.ems.core.Configuration;
 import de.fu_berlin.agdb.ems.core.ProfileLoader;
 import de.fu_berlin.agdb.ems.core.SourceParser;
@@ -30,14 +34,24 @@ public class App {
 	 * @param args not used yet
 	 */
     public static void main(String[] args) {
-	
+    	
     	// load configuration if it exists or create one otherwise
     	mainConfiguration.loadAndCreate();
     	
+    	CommandLineParser commandLineParser = new CommandLineParser();
+    	final CommandLine cmd = commandLineParser.parse(mainConfiguration, args);
+    	
+    	if (cmd.hasOption("version")) {
+    		System.out.println("Version: " + App.class.getPackage().getImplementationVersion());
+    		return;
+    	}
+    	
 		// create camel context for internal message routing
 		CamelContext camelContext = new DefaultCamelContext();
-		ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
-		camelContext.addComponent("ems-jms", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
+		if (mainConfiguration.getUseMessagingServer()) {
+			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false");
+			camelContext.addComponent("ems-jms", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
+		}
 
 		logger.info("Looking for interest files in: " + mainConfiguration.getSourcesFolder());
 		try {
@@ -47,22 +61,52 @@ public class App {
 			final ProfileLoader profileLoader = new ProfileLoader(algebra);
 			profileLoader.setProfilesFolder(mainConfiguration.getProfilesFolder());
 			
+			final SourceParser sourceParser; 
+			if (mainConfiguration.getLoaderPath() != null && mainConfiguration.getInputAdapterPath() != null) {
+				logger.info("Loader path: " + mainConfiguration.getLoaderPath());
+				logger.info("Input adapter path: " + mainConfiguration.getInputAdapterPath());
+				sourceParser = new SourceParser(mainConfiguration.getLoaderPath(), mainConfiguration.getInputAdapterPath());
+			}
+			else {
+				sourceParser = new SourceParser();
+			}
+
 			// this route loads source files from disk and process them via the SourceParser
 			camelContext.addRoutes(new RouteBuilder() {
-			    public void configure() {
-			    	// source files are moved to "inprogress" during processing and to "done" after processing
-					from(
-							"file://"
-									+ mainConfiguration.getSourcesFolder()
-									+ "?preMove=inprogress/&move=../done/&moveFailed=failed/")
-							.split().method(SourceParser.class, "split").to(Algebra.EVENT_QUEUE_URI);
-			    }
+				public void configure() {
+					if (cmd.getOptionValue("source-file") != null) {
+						logger.info("Loading source file: " + cmd.getOptionValue("source-file"));
+						File file = new File(cmd.getOptionValue("source-file"));
+						System.out.println("file://" + file.getParent() + "?fileName=" + file.getName()
+										+ "&noop=true");
+						from(
+								"file://" + file.getParent() + "?fileName=" + file.getName()
+										+ "&noop=true").split()
+								.method(sourceParser, "split")
+								.to(Algebra.EVENT_QUEUE_URI);
+					}
+					else {
+						// source files are moved to "inprogress" during processing and to "done" after processing
+						from(
+								"file://"
+										+ mainConfiguration.getSourcesFolder()
+										+ "?preMove=inprogress/&move=../done/&moveFailed=failed/")
+								.split().method(sourceParser, "split")
+								.to(Algebra.EVENT_QUEUE_URI);
+					}
+				}
 			});
 			
 			// this route processes all events of the main event queue with the algebra system
 			camelContext.addRoutes(new RouteBuilder() {
 			    public void configure() {
-					from(Algebra.EVENT_QUEUE_URI).to("ems-jms:queue:main.queue").process(algebra);
+			    	if (!mainConfiguration.getUseMessagingServer()) {
+			    		from(Algebra.EVENT_QUEUE_URI).process(algebra);
+			    	}
+			    	else {
+			    		logger.info("Using messaging server.");
+			    		from(Algebra.EVENT_QUEUE_URI).to("ems-jms:queue:main.queue").process(algebra);
+			    	}
 			    }
 			});
 			

@@ -27,6 +27,9 @@ public class ForEvent extends Operator {
 		
 		this.eventOp = eventOp;
 		this.op = op;
+		this.children = new Operator[2];
+		this.children[0] = eventOp;
+		this.children[1] = op;
 	}
 	
 	/* (non-Javadoc)

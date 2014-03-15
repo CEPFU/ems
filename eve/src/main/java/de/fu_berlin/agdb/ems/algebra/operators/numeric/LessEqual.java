@@ -3,7 +3,7 @@
  */
 package de.fu_berlin.agdb.ems.algebra.operators.numeric;
 
-import de.fu_berlin.agdb.ems.algebra.Operator;
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
@@ -11,7 +11,7 @@ import de.fu_berlin.agdb.ems.data.IEvent;
  * @author Ralf Oechsner
  *
  */
-public class LessEqual extends Operator {
+public class LessEqual extends Match {
 	
 	private boolean state = false;
 	private String attribute;

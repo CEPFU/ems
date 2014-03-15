@@ -1,9 +1,12 @@
 package de.fu_berlin.agdb.ems.core;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +26,10 @@ public class Configuration {
 	private Properties properties;
 	private String sourcesFolder = "sources";
 	private String profilesFolder = "profiles";
-	
+	private boolean useMessagingServer = false;
+	private String loaderPath;
+	private String inputAdapterPath;
+
 	/**
 	 * Main configuration.
 	 */
@@ -41,6 +47,9 @@ public class Configuration {
 		properties.load(new FileInputStream(CONFIG_PATH));
 		this.sourcesFolder = properties.getProperty("sourcesfolder");
 		this.profilesFolder = properties.getProperty("profilesfolder");
+		this.useMessagingServer = Boolean.parseBoolean(properties.getProperty("useMessagingServer"));
+		this.setLoaderPath(properties.getProperty("loaderPath"));
+		this.setInputAdapterPath(properties.getProperty("inputAdapterPath"));
 		logger.info("Configuration file " + CONFIG_PATH + " loaded.");
 	}
 	
@@ -51,8 +60,13 @@ public class Configuration {
 	 */
 	public void save() throws FileNotFoundException {
 		
-		properties.setProperty("sourcesfolder", sourcesFolder);
-		properties.setProperty("profilesfolder", profilesFolder);
+		properties.setProperty("sourcesfolder", this.sourcesFolder);
+		properties.setProperty("profilesfolder", this.profilesFolder);
+		properties.setProperty("useMessagingServer", String.valueOf(this.useMessagingServer));
+		if (loaderPath != null) // doesn't have to be in the config
+			properties.setProperty("loaderPath", this.loaderPath);
+		if (inputAdapterPath != null)
+			properties.setProperty("inputAdapterPath", this.inputAdapterPath);
 		
 		try {
 			properties.store(new FileOutputStream("config/main.properties"), "Main Configuration");
@@ -105,12 +119,86 @@ public class Configuration {
 		return profilesFolder;
 	}
 
-	
 	/**
 	 * Sets path to profile folder.
 	 * @param profilesFolder path to profile folder
 	 */
 	public void setProfilesFolder(String profilesFolder) {
 		this.profilesFolder = profilesFolder;
+	}
+	
+	/**
+	 * @return the useMessagingServer
+	 */
+	public boolean getUseMessagingServer() {
+		return useMessagingServer;
+	}
+
+	/**
+	 * @param useMessagingServer the useMessagingServer to set
+	 */
+	public void setUseMessagingServer(boolean useMessagingServer) {
+		this.useMessagingServer = useMessagingServer;
+	}
+
+	/**
+	 * @return the loaderPath
+	 */
+	public URL getLoaderPath() {
+		
+		URL url = null;
+		if (this.loaderPath != null) {
+			try {
+				url = (new File(this.loaderPath)).toURI().toURL();
+			} catch (MalformedURLException e) {
+				logger.error("Wrong loader path: " + this.loaderPath);
+			}
+		}
+		
+		return url;
+	}
+
+	/**
+	 * @param loaderPath the loaderPath to set
+	 */
+	public void setLoaderPath(String loaderPath) {
+		
+		if (loaderPath != null && new File(loaderPath).exists()) {
+			this.loaderPath = loaderPath;
+		}
+		else {
+			// loaderPath stays null
+			logger.warn("Loader path " + loaderPath + " doesn't exist! Falling back to default directory.");
+		}
+	}
+
+	/**
+	 * @return the inputAdapterPath
+	 */
+	public URL getInputAdapterPath() {
+		
+		URL url = null;
+		if (this.inputAdapterPath != null) {
+			try {
+				url = (new File(this.inputAdapterPath)).toURI().toURL();
+			} catch (MalformedURLException e) {
+				logger.error("Wrong input adapter path: " + this.inputAdapterPath);
+			}
+		}
+		
+		return url;
+	}
+
+	/**
+	 * @param inputAdapterPath the inputAdapterPath to set
+	 */
+	public void setInputAdapterPath(String inputAdapterPath) {
+		
+		if (inputAdapterPath != null && new File(inputAdapterPath).exists()) {
+			this.inputAdapterPath = inputAdapterPath;
+		}
+		else {
+			logger.warn("Input adapter path " + inputAdapterPath + " doesn't exist! Falling back to default directory.");
+		}
 	}
 }

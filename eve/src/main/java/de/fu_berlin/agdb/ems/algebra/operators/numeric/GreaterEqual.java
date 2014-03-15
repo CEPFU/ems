@@ -3,15 +3,16 @@
  */
 package de.fu_berlin.agdb.ems.algebra.operators.numeric;
 
-import de.fu_berlin.agdb.ems.algebra.Operator;
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
+ * GreaterEqual operator.
  * @author Ralf Oechsner
  *
  */
-public class GreaterEqual extends Operator {
+public class GreaterEqual extends Match {
 	
 	private boolean state = false;
 	private String attribute;

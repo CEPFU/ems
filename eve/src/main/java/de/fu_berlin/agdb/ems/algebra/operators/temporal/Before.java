@@ -5,7 +5,7 @@ package de.fu_berlin.agdb.ems.algebra.operators.temporal;
 
 import java.util.Date;
 
-import de.fu_berlin.agdb.ems.algebra.Operator;
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
@@ -14,7 +14,7 @@ import de.fu_berlin.agdb.ems.data.IEvent;
  * @author Ralf Oechsner
  *
  */
-public class Before extends Operator {
+public class Before extends Match {
 
 	private Date b;
 	

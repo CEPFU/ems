@@ -23,6 +23,8 @@ public class Not extends Operator {
 	public Not(Operator op) {
 		
 		this.op = op;
+		this.children = new Operator[1];
+		this.children[0] = op;
 	}
 	
 	/* (non-Javadoc)

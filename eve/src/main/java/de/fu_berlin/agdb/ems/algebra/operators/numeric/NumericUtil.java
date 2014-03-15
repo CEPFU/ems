@@ -7,6 +7,7 @@ import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
+ * Static functions that are used by numeric operators.
  * @author Ralf Oechsner
  *
  */

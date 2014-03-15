@@ -3,6 +3,7 @@
  */
 package de.fu_berlin.agdb.ems.algebra.dsl;
 
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.Operator;
 import de.fu_berlin.agdb.ems.algebra.operators.core.Attribute;
 import de.fu_berlin.agdb.ems.algebra.operators.core.ForEvent;
@@ -21,7 +22,7 @@ public class CoreBuilder {
 	 * @param attribute attribute that is checked.
 	 * @return true if event has attribute with that key, false else
 	 */
-	public static Operator attribute(String attribute) {
+	public static Match attribute(String attribute) {
 		
 		return new Attribute(attribute);
 	}

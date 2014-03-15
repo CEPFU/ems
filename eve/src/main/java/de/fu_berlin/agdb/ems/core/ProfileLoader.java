@@ -80,7 +80,7 @@ public class ProfileLoader implements Processor {
 		out.println(" * Source created on " + new Date());
 		out.println(" */");
 		out.println("import java.util.List;");
-		out.println("import de.fu_berlin.agdb.ems.algebra.Operator;");
+		out.println("import de.fu_berlin.agdb.ems.algebra.Match;");
 		out.println("import de.fu_berlin.agdb.ems.algebra.Profile;");
 		out.println("import de.fu_berlin.agdb.ems.data.Event;");
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.ProfileBuilder.*;");

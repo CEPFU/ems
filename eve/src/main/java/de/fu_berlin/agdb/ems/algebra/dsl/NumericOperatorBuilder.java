@@ -3,6 +3,7 @@
  */
 package de.fu_berlin.agdb.ems.algebra.dsl;
 
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.Operator;
 import de.fu_berlin.agdb.ems.algebra.operators.numeric.Equal;
 import de.fu_berlin.agdb.ems.algebra.operators.numeric.Greater;
@@ -24,7 +25,7 @@ public class NumericOperatorBuilder {
 	 * @param b event for comparison
 	 * @return true if attributes are equal, false else
 	 */
-	public static Operator equal(String attribute, IEvent b) {
+	public static Match equal(String attribute, IEvent b) {
 		
 		return new Equal(attribute, b);
 	}
@@ -35,7 +36,7 @@ public class NumericOperatorBuilder {
 	 * @param b object for comparison (primitives like e.g. int or double work as well)
 	 * @return true if attributes are equal, false else
 	 */
-	public static Operator equal(String attribute, Object b) {
+	public static Match equal(String attribute, Object b) {
 		
 		return new Equal(attribute, b);
 	}
@@ -46,7 +47,7 @@ public class NumericOperatorBuilder {
 	 * @param b event for comparison
 	 * @return true if attribute smaller, false else
 	 */
-	public static Operator less(String attribute, IEvent b) {
+	public static Match less(String attribute, IEvent b) {
 
 		return new Less(attribute, b);
 	}
@@ -57,7 +58,7 @@ public class NumericOperatorBuilder {
 	 * @param b object for comparison (primitives like e.g. int or double work as well)
 	 * @return true if attribute smaller, false else
 	 */
-	public static Operator less(String attribute, Object b) {
+	public static Match less(String attribute, Object b) {
 
 		return new Less(attribute, b);
 	}
@@ -68,7 +69,7 @@ public class NumericOperatorBuilder {
 	 * @param b event for comparison
 	 * @return true if attribute smaller or equal, false else
 	 */
-	public static Operator lessEqual(String attribute, IEvent b) {
+	public static Match lessEqual(String attribute, IEvent b) {
 
 		return new LessEqual(attribute, b);
 	}
@@ -79,7 +80,7 @@ public class NumericOperatorBuilder {
 	 * @param b object for comparison (primitives like e.g. int or double work as well)
 	 * @return true if attribute smaller or equal, false else
 	 */
-	public static Operator lessEqual(String attribute, Object b) {
+	public static Match lessEqual(String attribute, Object b) {
 
 		return new LessEqual(attribute, b);
 	}
@@ -90,7 +91,7 @@ public class NumericOperatorBuilder {
 	 * @param b event for comparison
 	 * @return true if attribute bigger, false else
 	 */
-	public static Operator greater(String attribute, IEvent b) {
+	public static Match greater(String attribute, IEvent b) {
 
 		return new Greater(attribute, b);
 	}
@@ -101,7 +102,7 @@ public class NumericOperatorBuilder {
 	 * @param b object for comparison (primitives like e.g. int or double work as well)
 	 * @return true if attribute bigger, false else
 	 */
-	public static Operator greater(String attribute, Object b) {
+	public static Match greater(String attribute, Object b) {
 
 		return new Greater(attribute, b);
 	}
@@ -112,7 +113,7 @@ public class NumericOperatorBuilder {
 	 * @param b object for comparison (primitives like e.g. int or double work as well)
 	 * @return true if attribute bigger, false else
 	 */
-	public static Operator greater(String attribute, Operator b) {
+	public static Match greater(String attribute, Operator b) {
 
 		return new Greater(attribute, b);
 	}
@@ -123,7 +124,7 @@ public class NumericOperatorBuilder {
 	 * @param b event for comparison
 	 * @return true if attribute bigger or equal, false else
 	 */
-	public static Operator greaterEqual(String attribute, IEvent b) {
+	public static Match greaterEqual(String attribute, IEvent b) {
 
 		return new GreaterEqual(attribute, b);
 	}
@@ -134,7 +135,7 @@ public class NumericOperatorBuilder {
 	 * @param b object for comparison (primitives like e.g. int or double work as well)
 	 * @return true if attribute bigger or equal, false else
 	 */
-	public static Operator greaterEqual(String attribute, Object b) {
+	public static Match greaterEqual(String attribute, Object b) {
 
 		return new GreaterEqual(attribute, b);
 	}

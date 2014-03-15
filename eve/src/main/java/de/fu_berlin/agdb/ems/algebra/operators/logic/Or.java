@@ -26,6 +26,9 @@ public class Or extends Operator {
 		
 		this.op1 = op1;
 		this.op2 = op2;
+		this.children = new Operator[2];
+		this.children[0] = op1;
+		this.children[1] = op2;
 	}
 	
 	/* (non-Javadoc)
