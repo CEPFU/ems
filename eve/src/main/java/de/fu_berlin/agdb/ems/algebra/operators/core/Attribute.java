@@ -36,8 +36,9 @@ public class Attribute extends Match {
 			throw new OperatorNotSupportedException("Null event.");
 		}
 		
-		if (event.getAttributes().containsKey(attribute))
+		if (event.getAttributes().containsKey(attribute)) {
 			this.lastMatchingEvent[0] = event;
+		}
 		
 		return this.lastMatchingEvent[0] != null;
 	}

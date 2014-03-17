@@ -27,6 +27,7 @@ import de.fu_berlin.agdb.ems.algebra.Algebra;
 import de.fu_berlin.agdb.ems.algebra.Profile;
 
 /**
+ * Loads profiles from profile files. 
  * @author Ralf Oechsner
  *
  */
@@ -84,6 +85,7 @@ public class ProfileLoader implements Processor {
 		out.println("import de.fu_berlin.agdb.ems.algebra.Profile;");
 		out.println("import de.fu_berlin.agdb.ems.data.Event;");
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.ProfileBuilder.*;");
+		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.WindowBuilder.*;");
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.NotificationBuilder.*;");
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.CoreBuilder.*;");
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.LogicOperatorBuilder.*;");

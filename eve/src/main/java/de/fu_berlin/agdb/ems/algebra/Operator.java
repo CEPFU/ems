@@ -3,6 +3,7 @@
  */
 package de.fu_berlin.agdb.ems.algebra;
 
+import de.fu_berlin.agdb.ems.algebra.windows.IWindow;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
@@ -15,6 +16,7 @@ public abstract class Operator {
 	protected boolean state = false;
 	protected IEvent[] lastMatchingEvent = null;
 	protected Operator[] children = null;
+	private IWindow window;
 	
 	/**
 	 * Apply the operator.
@@ -75,5 +77,21 @@ public abstract class Operator {
 		}
 		
 		return result;
+	}
+	
+	
+	public void setWindow(IWindow window) {
+	
+		this.window = window;
+		if (this.children != null) {
+			for (Operator curChild : this.children) {
+				curChild.setWindow(window);
+			}
+		}
+	}
+	
+	public IWindow getWindow() {
+		
+		return this.window;
 	}
 }

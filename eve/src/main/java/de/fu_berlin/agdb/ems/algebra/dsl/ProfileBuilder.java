@@ -9,14 +9,18 @@ import java.util.List;
 import de.fu_berlin.agdb.ems.algebra.Operator;
 import de.fu_berlin.agdb.ems.algebra.Profile;
 import de.fu_berlin.agdb.ems.algebra.notifications.Notification;
+import de.fu_berlin.agdb.ems.algebra.windows.EndlessWindow;
+import de.fu_berlin.agdb.ems.algebra.windows.IWindow;
 
 /**
+ * DSL for profiles.
  * @author Ralf Oechsner
  *
  */
 public class ProfileBuilder {
 	
 	private static List<Profile> profileList;
+	private static IWindow currentWindow;
 	
 	/**
 	 * Starts block with profiles. Is used in profile files automatically by 
@@ -25,6 +29,7 @@ public class ProfileBuilder {
 	public static void beginProfiles() {
 		
 		profileList = new ArrayList<Profile>();
+		currentWindow = new EndlessWindow(); // default window - can be overwritten by user
 	}
 	
 	/**
@@ -47,8 +52,18 @@ public class ProfileBuilder {
 	 */
 	public static void profile(Operator rule, Notification ... notifications) {
 		
-		Profile profile = new Profile(rule, notifications);
+		Profile profile = new Profile(rule, currentWindow.newInstance(), notifications);
 		
 		profileList.add(profile);
+	}
+	
+	/**
+	 * Sets the window that used for the next profiles until the window is changed again or
+	 * the profile file ends. Every profile file starts with an endless window as default.
+	 * @param window window for profiles
+	 */
+	public static void setWindow(IWindow window) {
+		
+		currentWindow = window;
 	}
 }

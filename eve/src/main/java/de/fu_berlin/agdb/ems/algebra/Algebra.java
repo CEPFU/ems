@@ -4,7 +4,10 @@
 package de.fu_berlin.agdb.ems.algebra;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -28,6 +31,7 @@ public class Algebra implements Processor {
 	private List<Profile> profiles;
 	private History history;
 	private ProducerTemplate producer;
+	private Queue<IEvent> queuedEvents;
 	
 	private static Logger logger = LogManager.getLogger();
 	
@@ -39,6 +43,7 @@ public class Algebra implements Processor {
 		
 		this.profiles = new ArrayList<Profile>();
 		this.history = new History();
+		this.queuedEvents = new LinkedList<IEvent>();
 		
 		// Create producer that is used for sending things back into the queue.
 		// It must be created only once because otherwise every time a producer is created
@@ -67,7 +72,17 @@ public class Algebra implements Processor {
 		for (Profile curProfile : this.profiles) {
 
 			try {
+				// first apply the profile, which may send composite events
 				curProfile.apply(event);
+				
+				// after application of the profile all composite events are
+				// sent
+				Iterator<IEvent> queueIterator = this.queuedEvents.iterator();
+				while (queueIterator.hasNext()) {
+					this.producer.sendBody(queueIterator.next());
+					queueIterator.remove();
+				}
+
 			} catch(OperatorNotSupportedException e) {
 				// no action required
 				logger.debug("Operator not supported: " + e.getMessage());
@@ -91,13 +106,12 @@ public class Algebra implements Processor {
 		this.profiles.add(profile);
 	}
 	
-	
 	/**
 	 * Sends event into the main algebra queue.
 	 * @param event event
 	 */
 	public void queueEvent(IEvent event) {
 		
-		this.producer.sendBody(event);
+		this.queuedEvents.add(event);
 	}
 }

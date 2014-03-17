@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.fu_berlin.agdb.ems.algebra.notifications.Notification;
+import de.fu_berlin.agdb.ems.algebra.windows.IWindow;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
@@ -20,18 +21,17 @@ public class Profile {
 
 	private Operator rule;
 	private Notification[] notifications;
+	private IWindow window;
 
 	private static Logger logger = LogManager.getLogger();
 	
-	public Profile(Operator rule, Notification notification) {
-		
-		this.rule = rule;
-		this.notifications = new Notification[1];
-		this.notifications[0] = notification;
-		this.notifications[0].setRule(rule);
-	}
-	
-	public Profile(Operator rule, Notification ... notifications) {
+	/**
+	 * Profile with a rule and a list of notifications that are send when the
+	 * rule matches.
+	 * @param rule rule
+	 * @param notifications list of notifications
+	 */
+	public Profile(Operator rule, IWindow window, Notification ... notifications) {
 	
 		this.rule = rule;
 		this.notifications = notifications;
@@ -39,23 +39,38 @@ public class Profile {
 		for (Notification curNotification : notifications) {
 			curNotification.setRule(rule);
 		}
+		
+		this.setWindow(window);
 	}
-	
+		
+	/**
+	 * Checks if the rule matches on an event and sends the notification(s) if
+	 * necessary.
+	 * @throws OperatorNotSupportedException thrown when an event type is not
+	 *                                       by an operator of the rule
+	 */
 	public void apply(IEvent event) throws OperatorNotSupportedException {
 		
 		if (this.rule.apply(event)) {
 			
 			logger.info("Matching events: " + this.rule.matchToString());
-		
-			// and reset matches so that rule only fires once (important!)
-			// it's also important to reset it before throwing the notification
-			// because otherwise it will result in an endless loop
-			this.rule.reset();
 			
 			// throw notifications
 			for (Notification curNotification : notifications) {
 				curNotification.apply();
 			}
+			
+			// and reset matches so that rule only fires once (important!)
+			// unlike in previous versions, the rule is now reset after the
+			// application of the notifications. This gives the notifications
+			// access to the matched events. To prevent an endless loop the events
+			// are now queued in the algebra and sent after completion of the profile
+			this.rule.reset();
+		}
+		
+		// windowing is checked regardless of match TODO: check
+		if (!this.window.apply()) {
+			this.rule.reset();
 		}
 	}
 
@@ -67,9 +82,23 @@ public class Profile {
 		
 		return notifications;
 	}
-
+	
+	/**
+	 * Sets the window for the rule of the profile.
+	 * @param window window for the rule
+	 */
+	public void setWindow(IWindow window) {
+		
+		this.window = window;
+		this.rule.setWindow(window);
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
+		
 		return "Profile [rule=" + rule + ", notifications="
 				+ Arrays.toString(notifications) + "]";
 	}
