@@ -31,8 +31,7 @@ public class After extends Match {
 	 * @param b event whose time stamp is compared
 	 */
 	public After(IEvent b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.b = b.getTimeStamp();
 	}
 	
@@ -41,8 +40,7 @@ public class After extends Match {
 	 * @param b time stamp that is compared
 	 */
 	public After(Date b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.b = b;
 	}
 	
@@ -52,15 +50,15 @@ public class After extends Match {
 	@Override
 	public boolean apply(IEvent event) throws OperatorNotSupportedException {
 
-		if (op != null && op.getMatchingEvents() != null) {
-			this.b = op.getMatchingEvents()[0].getTimeStamp();
+		if (op != null && op.getMatchingEvent() != null) {
+			this.b = op.getMatchingEvent().getTimeStamp();
 		}
 		
 		boolean comparison = event.getTimeStamp().after(b);
 		
 		if (comparison) {
 			state = true;
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 		
 		return state;

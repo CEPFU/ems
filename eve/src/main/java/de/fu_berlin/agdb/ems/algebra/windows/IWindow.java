@@ -17,5 +17,5 @@ public interface IWindow {
 	
 	public boolean apply();
 	
-	public void onMatch(IEvent[] events);
+	public void onMatch(IEvent event);
 }

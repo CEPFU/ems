@@ -23,8 +23,7 @@ public class Concurrent extends Match {
 	 * @param b event whose time stamp is compared
 	 */
 	public Concurrent(IEvent b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.b = b.getTimeStamp();
 	}
 	
@@ -33,8 +32,7 @@ public class Concurrent extends Match {
 	 * @param b time stamp that is compared
 	 */
 	public Concurrent(Date b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.b = b;
 	}
 	
@@ -48,7 +46,7 @@ public class Concurrent extends Match {
 		
 		if (comparison) {
 			state = true;
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 		
 		return state;

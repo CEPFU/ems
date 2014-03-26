@@ -15,6 +15,7 @@ public class CountWindow implements IWindow {
 
 	private long n;
 	private long eventsSinceMatch = 0;
+	private boolean hasMatched = false;
 
 	/**
 	 * Create a window that matches for the last n events.
@@ -40,10 +41,13 @@ public class CountWindow implements IWindow {
 	@Override
 	public boolean apply() {
 
-		this.eventsSinceMatch++;
-		
-		if ((this.eventsSinceMatch - 1) > n) {
-			return false;
+		if (this.hasMatched) {
+			this.eventsSinceMatch++;
+			
+			if (this.eventsSinceMatch >= n) {
+				this.hasMatched = false;
+				return false;
+			}
 		}
 		
 		return true;
@@ -53,8 +57,9 @@ public class CountWindow implements IWindow {
 	 * @see de.fu_berlin.agdb.ems.algebra.windows.IWindow#onMatch()
 	 */
 	@Override
-	public void onMatch(IEvent[] events) {
+	public void onMatch(IEvent event) {
 		
 		this.eventsSinceMatch = 0;
+		this.hasMatched = true;
 	}
 }

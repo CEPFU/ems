@@ -18,8 +18,7 @@ public class LessEqual extends Match {
 	private Object b;
 	
 	public LessEqual(String attribute, IEvent b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		if (b != null && b.getAttributes() != null && b.getAttributes().get(attribute) != null) {
 			this.b = b.getAttributes().get(attribute).getValue();
@@ -27,8 +26,7 @@ public class LessEqual extends Match {
 	}
 	
 	public LessEqual(String attribute, Object b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		this.b = b;
 	}
@@ -45,7 +43,7 @@ public class LessEqual extends Match {
 		
 		if (comparison) {
 			this.state = true;
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 			
 		return state;
@@ -57,6 +55,6 @@ public class LessEqual extends Match {
 	@Override
 	public String toString() {
 		
-		return "lessEqual(" + attribute + ", " + b + ")";
+		return "lessEqual(" + this.attribute + ", " + this.b + ")";
 	}
 }

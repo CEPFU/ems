@@ -17,8 +17,7 @@ public class Greater extends Match {
 	private Object b;
 	
 	public Greater(String attribute, IEvent b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		if (b != null && b.getAttributes() != null && b.getAttributes().get(attribute) != null) {
 			this.b = b.getAttributes().get(attribute).getValue();
@@ -27,7 +26,6 @@ public class Greater extends Match {
 	
 	public Greater(String attribute, Object b) {
 
-		this.lastMatchingEvent = new IEvent[1];
 		this.attribute = attribute;
 		this.b = b;
 	}
@@ -39,7 +37,7 @@ public class Greater extends Match {
 		
 		if (comparison) {
 			state = true;
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 		
 		return state;

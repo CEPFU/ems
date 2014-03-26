@@ -23,8 +23,7 @@ public class Less extends Match {
 	 * @param b event that it is compared to
 	 */
 	public Less(String attribute, IEvent b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		if (b != null && b.getAttributes() != null && b.getAttributes().get(attribute) != null) {
 			this.b = b.getAttributes().get(attribute).getValue();
@@ -38,7 +37,6 @@ public class Less extends Match {
 	 */
 	public Less(String attribute, Object b) {
 
-		this.lastMatchingEvent = new IEvent[1];
 		this.attribute = attribute;
 		this.b = b;
 	}
@@ -53,7 +51,7 @@ public class Less extends Match {
 		
 		if (comparison) {
 			state = true;
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 		
 		return state;
@@ -65,6 +63,6 @@ public class Less extends Match {
 	@Override
 	public String toString() {
 		
-		return "less(" + attribute + ", " + b + ")";
+		return "less(" + this.attribute + ", " + this.b + ")";
 	}
 }

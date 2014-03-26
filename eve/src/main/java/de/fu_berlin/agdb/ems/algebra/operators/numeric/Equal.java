@@ -19,8 +19,7 @@ public class Equal extends Match {
 	private Object b;
 	
 	public Equal(String attribute, IEvent b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		if (b != null && b.getAttributes() != null && b.getAttributes().get(attribute) != null) {
 			this.b = b.getAttributes().get(attribute).getValue();
@@ -28,8 +27,7 @@ public class Equal extends Match {
 	}
 	
 	public Equal(String attribute, Object b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		this.b = b;
 	}
@@ -44,7 +42,7 @@ public class Equal extends Match {
 		
 		if (comparison) {
 			this.state = true;
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 			
 		return state;
@@ -56,6 +54,11 @@ public class Equal extends Match {
 	@Override
 	public String toString() {
 		
-		return "equal(" + attribute + ", " + b + ")";
+		return "equal(" + this.attribute + ", " + this.b + ")";
+	}
+	
+	public void reset() {
+		
+		this.state = false;
 	}
 }

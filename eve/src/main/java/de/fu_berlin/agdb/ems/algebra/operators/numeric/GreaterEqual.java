@@ -19,8 +19,7 @@ public class GreaterEqual extends Match {
 	private Object b;
 	
 	public GreaterEqual(String attribute, IEvent b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		if (b != null && b.getAttributes() != null && b.getAttributes().get(attribute) != null) {
 			this.b = b.getAttributes().get(attribute).getValue();
@@ -28,8 +27,7 @@ public class GreaterEqual extends Match {
 	}
 	
 	public GreaterEqual(String attribute, Object b) {
-		
-		this.lastMatchingEvent = new IEvent[1];
+
 		this.attribute = attribute;
 		this.b = b;
 	}
@@ -42,11 +40,12 @@ public class GreaterEqual extends Match {
 		
 		// is not the same as just compare(attribute, event, b) >= 0 because an object
 		// can be equal to another without being a comparable (which compare() requires).
-		boolean comparison = NumericUtil.compare(attribute, event, b) > 0 || NumericUtil.equalAttribute(attribute, event, b);
+		boolean comparison = NumericUtil.compare(this.attribute, event, this.b) > 0 
+				|| NumericUtil.equalAttribute(this.attribute, event, this.b);
 		
 		if (comparison) {
 			this.state = true;
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 			
 		return state;
@@ -58,6 +57,6 @@ public class GreaterEqual extends Match {
 	@Override
 	public String toString() {
 		
-		return "greaterEqual(" + attribute + ", " + b + ")";
+		return "greaterEqual(" + this.attribute + ", " + this.b + ")";
 	}
 }

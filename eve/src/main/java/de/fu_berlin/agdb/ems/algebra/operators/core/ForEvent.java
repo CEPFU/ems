@@ -39,11 +39,12 @@ public class ForEvent extends Operator {
 	public boolean apply(IEvent event) throws OperatorNotSupportedException {
 		
 		// don't use the current event but that of eventOp
-		IEvent[] matches = eventOp.getMatchingEvents();
-		if (matches == null || matches.length == 0)
+		IEvent match = eventOp.getMatchingEvent();
+		if (match == null) {
 			throw new OperatorNotSupportedException("Referenced event Operator has no match.");
-		
-		return op.apply(matches[0]);
+		}
+			
+		return op.apply(match);
 	}
 
 	/* (non-Javadoc)
@@ -52,7 +53,7 @@ public class ForEvent extends Operator {
 	@Override
 	public String toString() {
 	
-		return "forEvent(" + eventOp + ", " + op + ")";
+		return "forEvent(" + this.eventOp + ", " + this.op + ")";
 	}
 	
 	/* (non-Javadoc)
@@ -62,7 +63,7 @@ public class ForEvent extends Operator {
 	public void reset() {
 		
 		// TODO: check
-		eventOp.reset();
-		op.reset();
+		this.eventOp.reset();
+		this.op.reset();
 	}
 }

@@ -35,7 +35,7 @@ public class EndlessWindow implements IWindow {
 	 * @see de.fu_berlin.agdb.ems.algebra.windows.IWindow#onMatch()
 	 */
 	@Override
-	public void onMatch(IEvent[] events) {
+	public void onMatch(IEvent event) {
 		
 		// nothing to do for endless window
 	}

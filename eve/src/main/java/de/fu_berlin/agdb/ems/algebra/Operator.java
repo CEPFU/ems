@@ -14,7 +14,7 @@ import de.fu_berlin.agdb.ems.data.IEvent;
 public abstract class Operator {
 
 	protected boolean state = false;
-	protected IEvent[] lastMatchingEvent = null;
+	private IEvent lastMatchingEvent = null;
 	protected Operator[] children = null;
 	private IWindow window;
 	
@@ -27,10 +27,20 @@ public abstract class Operator {
 	public abstract boolean apply(IEvent event) throws OperatorNotSupportedException;
 	
 	/**
+	 * Setter for matching events. 
+	 * @param events
+	 */
+	public void setMatchingEvent(IEvent event) {
+		
+		this.lastMatchingEvent = event;
+		this.getWindow().onMatch(event);
+	}
+	
+	/**
 	 * Get events that most recently matched the operator.
 	 * @return last matching event
 	 */
-	public IEvent[] getMatchingEvents() {
+	public IEvent getMatchingEvent() {
 		
 		return this.lastMatchingEvent;
 	}
@@ -65,33 +75,53 @@ public abstract class Operator {
 				result += curChild.matchToString();
 			}
 		}
-		else if (this.getMatchingEvents() != null) {
+		else if (this.getMatchingEvent() != null) {
 			
 			result += this.toString() + "{";
-			
-			for (IEvent curEvent : this.getMatchingEvents()) {
-				result += curEvent;
-			}
-			
+			result += this.getMatchingEvent();
 			result += "}";
 		}
 		
 		return result;
 	}
 	
-	
+	/**
+	 * Sets window to the operator and all it's children (recursively).
+	 * @param window window to set
+	 */
 	public void setWindow(IWindow window) {
 	
 		this.window = window;
 		if (this.children != null) {
 			for (Operator curChild : this.children) {
-				curChild.setWindow(window);
+				curChild.setWindow(window.newInstance());
 			}
 		}
 	}
 	
+	/**
+	 * Getter for window that is applied on the operator.
+	 * @return window of operator
+	 */
 	public IWindow getWindow() {
 		
 		return this.window;
+	}
+	
+	/**
+	 * Apply window to the operator and it's children (recursively).
+	 */
+	public void applyWindow() {
+		
+		if (this.children != null) {
+			for (Operator curChild : this.children) {
+				curChild.applyWindow();
+			}
+		}
+		else {
+			if (!this.window.apply()) {
+				this.reset();
+			}
+		}
 	}
 }

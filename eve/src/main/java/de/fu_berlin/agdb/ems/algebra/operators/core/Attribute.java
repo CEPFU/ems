@@ -22,7 +22,6 @@ public class Attribute extends Match {
 	 */
 	public Attribute(String attribute) {
 		
-		this.lastMatchingEvent = new IEvent[1];
 		this.attribute = attribute;
 	}
 	
@@ -37,10 +36,10 @@ public class Attribute extends Match {
 		}
 		
 		if (event.getAttributes().containsKey(attribute)) {
-			this.lastMatchingEvent[0] = event;
+			this.setMatchingEvent(event);
 		}
 		
-		return this.lastMatchingEvent[0] != null;
+		return this.getMatchingEvent() != null;
 	}
 
 	/* (non-Javadoc)
@@ -58,6 +57,6 @@ public class Attribute extends Match {
 	@Override
 	public void reset() {
 
-		this.lastMatchingEvent[0] = null;
+		this.setMatchingEvent(null);
 	}
 }

@@ -21,7 +21,6 @@ public class Profile {
 
 	private Operator rule;
 	private Notification[] notifications;
-	private IWindow window;
 
 	private static Logger logger = LogManager.getLogger();
 	
@@ -51,26 +50,27 @@ public class Profile {
 	 */
 	public void apply(IEvent event) throws OperatorNotSupportedException {
 		
-		if (this.rule.apply(event)) {
-			
-			logger.info("Matching events: " + this.rule.matchToString());
-			
-			// throw notifications
-			for (Notification curNotification : notifications) {
-				curNotification.apply();
+		try {
+			if (this.rule.apply(event)) {
+
+				logger.info("Matching events: " + this.rule.matchToString());
+
+				// throw notifications
+				for (Notification curNotification : notifications) {
+					curNotification.apply();
+				}
+
+				// and reset matches so that rule only fires once (important!)
+				// unlike in previous versions, the rule is now reset after the
+				// application of the notifications. This gives the notifications
+				// access to the matched events. To prevent an endless loop the events
+				// are now queued in the algebra and sent after completion of the profile
+				this.rule.reset();
 			}
-			
-			// and reset matches so that rule only fires once (important!)
-			// unlike in previous versions, the rule is now reset after the
-			// application of the notifications. This gives the notifications
-			// access to the matched events. To prevent an endless loop the events
-			// are now queued in the algebra and sent after completion of the profile
-			this.rule.reset();
-		}
-		
-		// windowing is checked regardless of match TODO: check
-		if (!this.window.apply()) {
-			this.rule.reset();
+		} finally {
+
+			// windowing is checked regardless of match TODO: check
+			this.rule.applyWindow();
 		}
 	}
 
@@ -88,8 +88,7 @@ public class Profile {
 	 * @param window window for the rule
 	 */
 	public void setWindow(IWindow window) {
-		
-		this.window = window;
+
 		this.rule.setWindow(window);
 	}
 	
