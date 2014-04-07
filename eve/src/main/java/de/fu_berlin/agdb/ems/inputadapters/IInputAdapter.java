@@ -5,7 +5,7 @@ import java.util.List;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
- * Interface for generic InputAdapter.
+ * Interface for input adapters.
  * @author Ralf Oechsner
  *
  */

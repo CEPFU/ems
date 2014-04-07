@@ -1,16 +1,21 @@
 package de.fu_berlin.agdb.ems.loader;
 
+/**
+ * Interface for loaders.
+ * @author Ralf Oechsner
+ *
+ */
 public interface ILoader {
 
 	/**
-	 * Load file.
+	 * Load source.
 	 * @return true if successful, false otherwise.
 	 */
 	public boolean load();
 	
 	/**
-	 * Content of loaded file as a string.
-	 * @return content of file.
+	 * Content of loaded source as a string.
+	 * @return content of source.
 	 */
 	public String getText();
 }

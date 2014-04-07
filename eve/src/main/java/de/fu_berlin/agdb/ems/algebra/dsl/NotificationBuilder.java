@@ -3,10 +3,14 @@
  */
 package de.fu_berlin.agdb.ems.algebra.dsl;
 
+import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.notifications.CompositeEventNotification;
 import de.fu_berlin.agdb.ems.algebra.notifications.Notification;
+import de.fu_berlin.agdb.ems.algebra.notifications.WriterNotification;
 import de.fu_berlin.agdb.ems.data.Event;
 import de.fu_berlin.agdb.ems.data.IEvent;
+import de.fu_berlin.agdb.ems.outputadapters.IOutputAdapter;
+import de.fu_berlin.agdb.ems.writers.IWriter;
 
 /**
  * DSL for notifications.
@@ -35,5 +39,10 @@ public class NotificationBuilder {
 	public static Notification compositeEventNotification(String attribute, Object attributeValue) {
 		
 		return new CompositeEventNotification(new Event(attribute, attributeValue)); 
+	}
+	
+	public static Notification writerNotification(IWriter writer, IOutputAdapter outputAdapter, Match ... matches) {
+		
+		return new WriterNotification(writer, outputAdapter, matches);
 	}
 }

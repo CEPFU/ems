@@ -175,11 +175,17 @@ public class CSVInputAdapter implements IInputAdapter {
 		scanner.close();
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.agdb.ems.inputadapters.IInputAdapter#getEvents()
+	 */
 	public List<IEvent> getEvents() {
 
 		return this.events;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.agdb.ems.inputadapters.IInputAdapter#load(java.lang.String)
+	 */
 	@Override
 	public void load(String text) {
 	

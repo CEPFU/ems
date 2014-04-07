@@ -91,6 +91,8 @@ public class ProfileLoader implements Processor {
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.LogicOperatorBuilder.*;");
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.TemporalOperatorBuilder.*;");
 		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.NumericOperatorBuilder.*;");
+		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.OutputAdapterBuilder.*;");
+		out.println("import static de.fu_berlin.agdb.ems.algebra.dsl.WriterBuilder.*;");
 		out.println("public class " + classname + " {");
 		out.println("    public static List<Profile> profilesDefinition() {");
 		out.println("        beginProfiles();");

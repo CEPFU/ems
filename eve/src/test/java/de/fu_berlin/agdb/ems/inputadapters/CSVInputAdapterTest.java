@@ -36,7 +36,7 @@ public class CSVInputAdapterTest {
 	 * Adds hard coded event.
 	 * @param time time of event
 	 * @param temperature temperature (example of attribute) 
-	 * @param humidity humidty (second example of attribute)
+	 * @param humidity humidity (second example of attribute)
 	 * @throws ParseException in case the time stamp can't be parsed (wrong time stamp format).
 	 */
 	private void addTestEvent(String time, String temperature, String humidity) throws ParseException {
@@ -69,7 +69,7 @@ public class CSVInputAdapterTest {
 	public void setUp() throws ParseException {
 		
 		testEvents = new ArrayList<Event>();
-		timeStampFormat = "EEE MMM dd HH:mm:ss z YYYY";
+		timeStampFormat = "EEE MMM dd HH:mm:ss z yyyy";
 		
 		// compare it to these events (must be in same order!)
 		this.addTestEvent("Mon Dec 31 23:01:00 CET 2012", "25", "60");
