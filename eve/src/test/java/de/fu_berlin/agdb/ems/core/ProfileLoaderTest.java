@@ -26,8 +26,7 @@ public class ProfileLoaderTest {
 	@Test
 	public void test() throws IOException {
 		
-		ProfileLoader profileLoader = new ProfileLoader(null);
-		profileLoader.setProfilesFolder("profiles");
+		ProfileLoader profileLoader = new ProfileLoader(null, "profiles");
 		profileLoader.load("profile(and(attribute(\"Temperature\"), attribute(\"Humidity\")), new CompositeEventNotification(new Event(\"description\", \"SEND CEP\")));");
 		
 		assertTrue(true);

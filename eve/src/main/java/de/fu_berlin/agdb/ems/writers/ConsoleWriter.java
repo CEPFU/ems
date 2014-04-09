@@ -31,4 +31,12 @@ public class ConsoleWriter implements IWriter {
 		this.text = text;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		return "consoleWriter()";
+	}
 }

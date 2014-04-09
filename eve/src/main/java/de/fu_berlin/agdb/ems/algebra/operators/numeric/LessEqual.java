@@ -8,6 +8,7 @@ import de.fu_berlin.agdb.ems.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.ems.data.IEvent;
 
 /**
+ * LessEqual operator.
  * @author Ralf Oechsner
  *
  */
@@ -17,6 +18,11 @@ public class LessEqual extends Match {
 	private String attribute;
 	private Object b;
 	
+	/**
+	 * LessEqual operator.
+	 * @param attribute attribute that is compared
+	 * @param b event that it is compared to
+	 */
 	public LessEqual(String attribute, IEvent b) {
 
 		this.attribute = attribute;
@@ -25,6 +31,11 @@ public class LessEqual extends Match {
 		}
 	}
 	
+	/**
+	 * LessEqual operator.
+	 * @param attribute attribute that is compared
+	 * @param b object that it is compared to
+	 */
 	public LessEqual(String attribute, Object b) {
 
 		this.attribute = attribute;

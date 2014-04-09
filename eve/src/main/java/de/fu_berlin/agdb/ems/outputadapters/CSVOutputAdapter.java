@@ -5,6 +5,7 @@ package de.fu_berlin.agdb.ems.outputadapters;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.TreeSet;
 
 import de.fu_berlin.agdb.ems.data.IAttribute;
@@ -95,4 +96,20 @@ public class CSVOutputAdapter implements IOutputAdapter {
 		return this.output;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		String s = "CSVOutputAdapter(" + timeStampCaption
+				+ ", " + timeStampFormat + ", " + delimiter;
+		if (this.captions != null) {
+			s += ", " + Arrays.toString(captions);
+		}
+		
+		return s + ")";
+	}
+
+	
 }

@@ -42,20 +42,21 @@ public class ProfileLoader implements Processor {
 	 * Loads profiles from profile files into an algebra.
 	 * @param algebra algebra the profiles are loaded to
 	 */
-	public ProfileLoader(Algebra algebra) {
+	public ProfileLoader(Algebra algebra, String profilesFolder) {
 		
 		this.algebra = algebra;
+		this.profilesFolder = profilesFolder;
 	}
 	
-	/**
-	 * Setter for path of the folder where profiles are stored.
-	 * @param path profile folder
-	 */
-	public void setProfilesFolder(String path) {
-		
-		this.profilesFolder = path;
-	}
-	
+//	/**
+//	 * Setter for path of the folder where profiles are stored.
+//	 * @param path profile folder
+//	 */
+//	public void setProfilesFolder(String path) {
+//		
+//		this.profilesFolder = path;
+//	}
+//	
 	/**
 	 * Compiles profile definition and returns a profile list that can be added to an algebra.
 	 * @param definition profile definitions

@@ -3,6 +3,8 @@
  */
 package de.fu_berlin.agdb.ems.algebra.notifications;
 
+import java.util.Arrays;
+
 import de.fu_berlin.agdb.ems.algebra.Algebra;
 import de.fu_berlin.agdb.ems.algebra.Match;
 import de.fu_berlin.agdb.ems.algebra.Operator;
@@ -11,6 +13,7 @@ import de.fu_berlin.agdb.ems.outputadapters.IOutputAdapter;
 import de.fu_berlin.agdb.ems.writers.IWriter;
 
 /**
+ * Writer notification.
  * @author Ralf Oechsner
  *
  */
@@ -21,6 +24,13 @@ public class WriterNotification implements Notification {
 	private IOutputAdapter outputAdapter;
 	private Match[] matches;
 	
+	/**
+	 * Creates a notification that sends matches to a writer. The messages are
+	 * transformed by a specified output adapter before they written.
+	 * @param writer writer where the events of the matches are sent
+	 * @param outputAdapter output adapter that transforms the events to output format
+	 * @param matches matches whose events are sent
+	 */
 	public WriterNotification(IWriter writer, IOutputAdapter outputAdapter, Match[] matches) {
 		
 		this.writer = writer;
@@ -70,6 +80,15 @@ public class WriterNotification implements Notification {
 	public void setAlgebra(Algebra algebra) {
 
 		// not needed here
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "writerNotification(" + writer
+				+ ", " + outputAdapter + ", " + Arrays.toString(matches) + ")";
 	}
 
 }

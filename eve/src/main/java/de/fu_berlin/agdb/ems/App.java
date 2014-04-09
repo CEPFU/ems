@@ -58,8 +58,7 @@ public class App {
 			
 			final Algebra algebra = new Algebra(camelContext);
 			
-			final ProfileLoader profileLoader = new ProfileLoader(algebra);
-			profileLoader.setProfilesFolder(mainConfiguration.getProfilesFolder());
+			final ProfileLoader profileLoader = new ProfileLoader(algebra, mainConfiguration.getProfilesFolder());
 			
 			final SourceParser sourceParser; 
 			if (mainConfiguration.getLoaderPath() != null && mainConfiguration.getInputAdapterPath() != null) {

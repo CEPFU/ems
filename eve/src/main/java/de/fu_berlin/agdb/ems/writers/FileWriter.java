@@ -26,11 +26,20 @@ public class FileWriter implements IWriter {
 	
 	private static Logger logger = LogManager.getLogger();
 	
+	/**
+	 * Writes output to a text file. UTF-8 encoding is used.
+	 * @param path path where the file is written (including file name)
+	 */
 	public FileWriter(String path) {
 		
 		this(path, "utf-8");
 	}
 	
+	/**
+	 * Writes output to a text file. Encoding can be specified.
+	 * @param path path where the file is written (including file name)
+	 * @param encoding encoding of the text file (e.g utf-8)
+	 */
 	public FileWriter(String path, String encoding) {
 		
 		this.path = path;
@@ -77,4 +86,15 @@ public class FileWriter implements IWriter {
 		this.text = text;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		return "fileWriter(" + path + ", "
+				+ encoding + ")";
+	}
+
+	
 }

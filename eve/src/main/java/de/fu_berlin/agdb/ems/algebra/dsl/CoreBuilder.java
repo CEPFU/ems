@@ -41,12 +41,12 @@ public class CoreBuilder {
 	/**
 	 * Evaluates the second operator only on the matches
 	 * of the first operator.
-	 * @param eventOp
-	 * @param op
-	 * @return
+	 * @param match matched operator
+	 * @param op operator that is evaluated
+	 * @return true if second operator matched for event of first operator
 	 */
-	public static Operator forEvent(Operator eventOp, Operator op) {
+	public static Operator forEvent(Match match, Operator op) {
 		
-		return new ForEvent(eventOp, op);
+		return new ForEvent(match, op);
 	}
 }
