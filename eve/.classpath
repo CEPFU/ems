@@ -18,6 +18,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar"/>
+	<classpathentry kind="lib" path="/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
