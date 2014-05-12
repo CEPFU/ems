@@ -61,12 +61,21 @@ public class CoreBuilder {
 	public static Match match(final IEvent event) {
 		
 		Match m = new Match() {
+			
+			/* (non-Javadoc)
+			 * @see de.fu_berlin.agdb.crepe.algebra.Operator#apply(de.fu_berlin.agdb.crepe.data.IEvent)
+			 */
 			@Override
 			public boolean apply(IEvent event) throws OperatorNotSupportedException {
+			
 				return true;
 			}
 			
+			/* (non-Javadoc)
+			 * @see java.lang.Object#toString()
+			 */
 			public String toString() {
+				
 				return "match(" + this.getMatchingEvent() + ")";
 			}
 		};
@@ -88,6 +97,9 @@ public class CoreBuilder {
 		
 		Operator op = new Operator() {
 			
+			/* (non-Javadoc)
+			 * @see de.fu_berlin.agdb.crepe.algebra.Operator#apply(de.fu_berlin.agdb.crepe.data.IEvent)
+			 */
 			@Override
 			public boolean apply(IEvent event) throws OperatorNotSupportedException {
 				
@@ -99,12 +111,18 @@ public class CoreBuilder {
 				return opState;
 			}
 			
+			/* (non-Javadoc)
+			 * @see de.fu_berlin.agdb.crepe.algebra.Operator#reset()
+			 */
 			@Override
 			public void reset() {
 				
 				match.reset();
 			}
 			
+			/* (non-Javadoc)
+			 * @see java.lang.Object#toString()
+			 */
 			@Override
 			public String toString() {
 				
@@ -116,6 +134,12 @@ public class CoreBuilder {
 		return op;
 	}
 	
+	/**
+	 * Creates count operator.
+	 * @param op operator whose matches are counted
+	 * @param count number of matches that are needed for matching
+	 * @return count operator
+	 */
 	public static Match count(Operator op, long count) {
 		
 		return new Count(op, count);

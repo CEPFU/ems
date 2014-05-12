@@ -43,6 +43,11 @@ public class Less extends Match {
 		this.b = b;
 	}
 	
+	/**
+	 * Less operator.
+	 * @param attribute attribute that  is compared
+	 * @param b operator that it is compared to
+	 */
 	public Less(String attribute, Operator b) {
 		
 		this.attribute = attribute;
@@ -57,7 +62,7 @@ public class Less extends Match {
 	public boolean apply(IEvent event) throws OperatorNotSupportedException {
 
 		if (this.op != null) {
-//			this.op.apply(event);
+
 			if (this.op.getMatchingEvent() == null)
 				throw new OperatorNotSupportedException("Null event.");
 			if (!this.op.getMatchingEvent().getAttributes().containsKey(this.attribute)) {

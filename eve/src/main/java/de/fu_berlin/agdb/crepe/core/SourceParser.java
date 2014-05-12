@@ -66,6 +66,11 @@ public class SourceParser implements Processor {
 		this.generateParameters();
 	}
 	
+	/**
+	 * Loads the source loader with non default paths.
+	 * @param loaderPath loader path
+	 * @param inputAdapterPath input adapter path
+	 */
 	public SourceParser(URL loaderPath, URL inputAdapterPath) {
 		
 		this.loaderPath = loaderPath;

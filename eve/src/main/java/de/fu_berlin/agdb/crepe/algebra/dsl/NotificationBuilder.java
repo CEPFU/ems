@@ -44,6 +44,14 @@ public class NotificationBuilder {
 		return new CompositeEventNotification(new Event(attribute, attributeValue)); 
 	}
 	
+	/**
+	 * Creates a notification that sends one composite event to the event stream that has
+	 * one attribute.
+	 * @param attribute attribute of the event that is sent into the stream
+	 * @param attributeValue value of the attribute
+	 * @param asAttribute attribute name of composite event attribute
+	 * @return CompositeEventNotification CompositeEventNotification
+	 */
 	public static Notification compositeEventNotification(Match match, String attribute, String asAttribute) {
 		
 		return new CompositeEventNotification(match, attribute, asAttribute);

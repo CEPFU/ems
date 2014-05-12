@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import de.fu_berlin.agdb.crepe.core.Tag;
 
 
@@ -19,6 +22,8 @@ public class URLLoader implements ILoader {
 	private String text;
 	private URL url;
 	
+	private static Logger logger = LogManager.getLogger();
+	
 	/**
 	 * Loader for any file that can be loaded with an URL (e.g. via HTTP).
 	 * @param url URL of file to load.
@@ -28,8 +33,7 @@ public class URLLoader implements ILoader {
 		try {
 			this.url = new URL(url);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Malformed URL: ", e);
 		}
 		this.text = "";  // start with an empty string
 	}

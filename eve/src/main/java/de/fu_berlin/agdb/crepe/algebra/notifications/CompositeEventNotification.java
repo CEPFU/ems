@@ -44,6 +44,13 @@ public class CompositeEventNotification implements Notification {
 		}
 	}
 	
+
+	/**
+	 * Creates a notification that sends one or more events to the algebra queue.
+	 * @param events composite events to be sent
+	 * @param attribute attribute of the event that is sent into the stream
+	 * @param attributeValue value of the attribute
+	 */
 	public CompositeEventNotification(Match match, String attribute, String asAttribute) {
 		
 		this.match = match;

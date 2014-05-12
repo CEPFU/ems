@@ -93,6 +93,4 @@ public class FileWriter implements IWriter {
 		return "fileWriter(" + path + ", "
 				+ append + ")";
 	}
-
-	
 }

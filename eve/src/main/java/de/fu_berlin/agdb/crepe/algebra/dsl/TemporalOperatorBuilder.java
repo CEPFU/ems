@@ -41,6 +41,26 @@ public class TemporalOperatorBuilder {
 	}
 	
 	/**
+	 * after: True if event happens before match b.
+	 * @param b operator
+	 * @return true if event happens after time stamp b, false else
+	 */
+	public static Operator before(Match b) {
+		
+		return new Before(b);
+	}
+	
+	/**
+	 * before: True if match m1 happens before match m2.
+	 * @param b operator
+	 * @return true if event happens after time stamp b, false else
+	 */
+	public static Match before(Match m1, Match m2) {
+
+		return new Before(m1, m2);
+	}
+	
+	/**
 	 * after: True if event happens after event b.
 	 * @param b event b
 	 * @return true if event happens after event b, false else
@@ -61,7 +81,7 @@ public class TemporalOperatorBuilder {
 	}
 	
 	/**
-	 * after: True if event happens after event b.
+	 * after: True if event happens after match b.
 	 * @param b operator
 	 * @return true if event happens after time stamp b, false else
 	 */
@@ -70,8 +90,13 @@ public class TemporalOperatorBuilder {
 		return new After(b);
 	}
 	
+	/**
+	 * after: True if match m1 happens after match m2.
+	 * @param b operator
+	 * @return true if event happens after time stamp b, false else
+	 */
 	public static Match after(Match m1, Match m2) {
-		// TODO: match or operator?
+
 		return new After(m1, m2);
 	}
 	

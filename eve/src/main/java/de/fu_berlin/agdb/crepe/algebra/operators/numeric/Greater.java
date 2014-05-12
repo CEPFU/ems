@@ -19,6 +19,11 @@ public class Greater extends Match {
 	private Object b;
 	private Operator op;
 	
+	/**
+	 * Greater operator.
+	 * @param attribute attribute that is compared
+	 * @param b event that it is compared to
+	 */
 	public Greater(String attribute, IEvent b) {
 
 		this.attribute = attribute;
@@ -27,12 +32,22 @@ public class Greater extends Match {
 		}
 	}
 	
+	/**
+	 * Greater operator.
+	 * @param attribute attribute that  is compared
+	 * @param b object that it is compared to (primitives like e.g. int or double work as well)
+	 */
 	public Greater(String attribute, Object b) {
 
 		this.attribute = attribute;
 		this.b = b;
 	}
 	
+	/**
+	 * Greater operator.
+	 * @param attribute attribute that  is compared
+	 * @param b operator that it is compared to
+	 */
 	public Greater(String attribute, Operator b) {
 		
 		this.attribute = attribute;
@@ -47,7 +62,7 @@ public class Greater extends Match {
 	public boolean apply(IEvent event) throws OperatorNotSupportedException {
 
 		if (this.op != null) {
-//			this.op.apply(event);
+
 			if (this.op.getMatchingEvent() == null)
 				throw new OperatorNotSupportedException("Null event.");
 			if (!this.op.getMatchingEvent().getAttributes().containsKey(this.attribute)) {
@@ -66,6 +81,9 @@ public class Greater extends Match {
 		return state;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		

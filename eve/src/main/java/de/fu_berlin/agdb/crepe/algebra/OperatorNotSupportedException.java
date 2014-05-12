@@ -4,13 +4,14 @@
 package de.fu_berlin.agdb.crepe.algebra;
 
 /**
+ * Exception that is used for ignoring operators.
  * @author Ralf Oechsner
  *
  */
 public class OperatorNotSupportedException extends Exception {
 
 	/**
-	 * 
+	 * OperatorNotSupporedException UID
 	 */
 	private static final long serialVersionUID = -1519543888045598378L;
 

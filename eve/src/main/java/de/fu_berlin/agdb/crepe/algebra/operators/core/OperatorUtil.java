@@ -13,6 +13,13 @@ import de.fu_berlin.agdb.crepe.algebra.OperatorNotSupportedException;
  */
 public class OperatorUtil {
 	
+	/**
+	 * Utility function to get operands.
+	 * @param attribute attribute of operand
+	 * @param op operator whose attribute should be returned
+	 * @return object with operand
+	 * @throws OperatorNotSupportedException thrown if null event or attribute not found
+	 */
 	public static Object getOperands(String attribute, Operator op) throws OperatorNotSupportedException {
 		
 		Object a = null;

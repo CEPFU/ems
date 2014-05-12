@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * Simple command line parser that is used for the backend.
  * @author Ralf Oechsner
  *
  */
@@ -20,17 +21,28 @@ public class CommandLineParser {
 	Options options;
 	private static Logger logger = LogManager.getLogger();
 	
+	/**
+	 * Creates a command line parser.
+	 */
 	@SuppressWarnings("static-access") // because of bug in commons cli 1.2 (will be fixed in 1.3)
 	public CommandLineParser() {
 		
 		this.options = new Options();
-		this.options.addOption(OptionBuilder.withLongOpt("version").withDescription("output version information and exit").create("v"));
+		this.options.addOption(OptionBuilder.withLongOpt("version")
+				.withDescription("output vbiggerersion information and exit")
+				.create("v"));
 
 		this.options.addOption(OptionBuilder.withLongOpt("source-file").hasArg()
                 .withArgName("FILE")
                 .withDescription("process a source FILE and exit").create("s"));
 	}
 	
+	/**
+	 * Parses command line options and writes settings to the configuration.
+	 * @param configuration main config
+	 * @param args command line arguments.
+	 * @return command line object
+	 */
 	public CommandLine parse(Configuration configuration, String[] args) {
 		
 		org.apache.commons.cli.CommandLineParser parser = new GnuParser();

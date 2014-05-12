@@ -34,7 +34,6 @@ import de.fu_berlin.agdb.crepe.data.IEvent;
  */
 public class RSSInputAdapter implements IInputAdapter {
 
-
 	private List<IEvent> events;
 	
 	/**
@@ -126,11 +125,18 @@ public class RSSInputAdapter implements IInputAdapter {
 		return new Event(timeStamp, attributes);
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.agdb.crepe.inputadapters.IInputAdapter#getEvents()
+	 */
+	@Override
 	public List<IEvent> getEvents() {
 		
 		return this.events;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.agdb.crepe.inputadapters.IInputAdapter#load(java.lang.String)
+	 */
 	@Override
 	public void load(String text) {
 

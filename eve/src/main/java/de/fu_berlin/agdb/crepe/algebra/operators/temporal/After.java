@@ -20,14 +20,7 @@ public class After extends Match {
 	private Date b;
 	private Match match;
 	private Match m1, m2; 
-	
-	public After(Match match) {
-		
-		this.match = match;
-		this.children = new Operator[1];
-		this.children[0] = match;
-	}
-	
+
 	/**
 	 * Temporal after operator.
 	 * @param b event whose time stamp is compared
@@ -46,13 +39,26 @@ public class After extends Match {
 		this.b = b;
 	}
 	
+	/**
+	 * Temporal after operator. 
+	 * @param match
+	 */
+	public After(Match match) {
+		
+		this.match = match;
+		this.setChildren(match);
+	}
+	
+	/**
+	 * Temporal after operator.
+	 * @param m1 match after
+	 * @param m2 match before
+	 */
 	public After(Match m1, Match m2) {
 		
 		this.m1 = m1;
 		this.m2 = m2;
-		this.children = new Operator[2];
-		this.children[0] = m1;
-		this.children[1] = m2;
+		this.setChildren(m1, m2);
 	}
 	
 	/* (non-Javadoc)
@@ -71,7 +77,7 @@ public class After extends Match {
 			if (e1 != null && e2 != null) {
 				if (e1.getTimeStamp().after(e2.getTimeStamp())) {
 					state = true;
-					this.setMatchingEvent(e2); // arbitrary TODO: reconsider
+					this.setMatchingEvent(e2);
 				}
 			}
 		}
@@ -105,5 +111,19 @@ public class After extends Match {
 	public String toString() {
 		
 		return "after(" + this.b + ")";
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.agdb.crepe.algebra.Operator#reset()
+	 */
+	@Override
+	public void reset() {
+		
+		this.state = false;
+		if (this.getChildren() != null) {
+			for (Operator curChild : this.getChildren()) {
+				curChild.reset();
+			}
+		}
 	}
 }

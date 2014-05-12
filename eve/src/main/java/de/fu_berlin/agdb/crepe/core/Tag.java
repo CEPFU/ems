@@ -9,6 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Tag for marking options for source files.
  * @author Ralf Oechsner
  *
  */

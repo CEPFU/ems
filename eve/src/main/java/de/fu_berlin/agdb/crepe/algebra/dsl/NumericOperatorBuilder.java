@@ -114,6 +114,17 @@ public class NumericOperatorBuilder {
 	}
 	
 	/**
+	 * lessEqual: True if attribute of event is small than or equal to matching event of operator b.
+	 * @param attribute attribute that is compared
+	 * @param b object for comparison (primitives like e.g. int or double work as well)
+	 * @return true if attribute bigger, false else
+	 */
+	public static Match lessEqual(String attribute, Operator b) {
+
+		return new LessEqual(attribute, b);
+	}
+	
+	/**
 	 * greater: True if attribute of event is bigger than that of event b.
 	 * @param attribute attribute that is compared
 	 * @param b event for comparison
@@ -164,6 +175,17 @@ public class NumericOperatorBuilder {
 	 * @return true if attribute bigger or equal, false else
 	 */
 	public static Match greaterEqual(String attribute, Object b) {
+
+		return new GreaterEqual(attribute, b);
+	}
+	
+	/**
+	 * greaterEqual: True if attribute of event is bigger than or equal to matching event of operator b.
+	 * @param attribute attribute that is compared
+	 * @param b object for comparison (primitives like e.g. int or double work as well)
+	 * @return true if attribute bigger, false else
+	 */
+	public static Match greaterEqual(String attribute, Operator b) {
 
 		return new GreaterEqual(attribute, b);
 	}

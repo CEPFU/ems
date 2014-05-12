@@ -11,4 +11,5 @@ package de.fu_berlin.agdb.crepe.algebra;
  */
 public abstract class Match extends Operator {
 	
+	// just a placeholder object for the DSL, so no code (yet)
 }

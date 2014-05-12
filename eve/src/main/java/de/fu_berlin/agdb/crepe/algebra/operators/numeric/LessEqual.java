@@ -4,6 +4,7 @@
 package de.fu_berlin.agdb.crepe.algebra.operators.numeric;
 
 import de.fu_berlin.agdb.crepe.algebra.Match;
+import de.fu_berlin.agdb.crepe.algebra.Operator;
 import de.fu_berlin.agdb.crepe.algebra.OperatorNotSupportedException;
 import de.fu_berlin.agdb.crepe.data.IEvent;
 
@@ -17,6 +18,7 @@ public class LessEqual extends Match {
 	private boolean state = false;
 	private String attribute;
 	private Object b;
+	private Operator op;
 	
 	/**
 	 * LessEqual operator.
@@ -42,11 +44,33 @@ public class LessEqual extends Match {
 		this.b = b;
 	}
 	
+	/**
+	 * LessEqual operator.
+	 * @param attribute attribute that  is compared
+	 * @param b operator that it is compared to
+	 */
+	public LessEqual(String attribute, Operator b) {
+		
+		this.attribute = attribute;
+		this.op = b;
+		this.setChildren(op);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.fu_berlin.agdb.ems.algebra.Operator#apply(de.fu_berlin.agdb.ems.data.IEvent)
 	 */
 	@Override
 	public boolean apply(IEvent event) throws OperatorNotSupportedException {
+		
+		if (this.op != null) {
+
+			if (this.op.getMatchingEvent() == null)
+				throw new OperatorNotSupportedException("Null event.");
+			if (!this.op.getMatchingEvent().getAttributes().containsKey(this.attribute)) {
+				throw new OperatorNotSupportedException("Attribute not found.");
+			}
+			this.b = this.op.getMatchingEvent().getAttributes().get(this.attribute).getValue();
+		}
 		
 		// is not the same as just compare(attribute, event, b) <= 0 because an object
 		// can be equal to another without being a comparable (which compare() requires).

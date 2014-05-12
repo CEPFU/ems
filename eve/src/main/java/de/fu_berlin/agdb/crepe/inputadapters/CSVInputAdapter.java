@@ -51,12 +51,14 @@ public class CSVInputAdapter implements IInputAdapter {
 		this.events = new ArrayList<IEvent>();
 	}
 	
+
 	/**
-	 * 
-	 * @param timeStampCaption
-	 * @param timeStampFormat
-	 * @param delimiter
-	 * @param columnTypes
+	 * InputAdapter for CSV files.
+	 * @param csvText text of CSV file. First line must contain captions of columns.
+	 * @param timeStampCaption caption of time stamp column (case sensitive!).
+	 * @param timeStampFormat format string of time stamp (see java.text.SimpleDateFormat).
+	 * @param delimter delimiter of columns (e.g. "," or ";" or "\t").
+	 * @param columnTypes types of the columns
 	 */
 	public CSVInputAdapter(@Tag("timeStampCaption") String timeStampCaption, @Tag("timeStampFormat") String timeStampFormat, @Tag("delimiter") String delimiter, @Tag("columnTypes") String columnTypes) {
 
@@ -136,16 +138,15 @@ public class CSVInputAdapter implements IInputAdapter {
 						try {
 							curAttributes.put(keys.get(col), new Attribute(this.columnTypes[col].newInstance(token)));
 						} catch (InstantiationException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							logger.error("CSV parsing error: ", e);
 						} catch (IllegalAccessException e) {
-							// TODO Auto-generated catch block
+							logger.error("CSV parsing error: ", e);
 							e.printStackTrace();
 						} catch (IllegalArgumentException e) {
-							// TODO Auto-generated catch block
+							logger.error("CSV parsing error: ", e);
 							e.printStackTrace();
 						} catch (InvocationTargetException e) {
-							// TODO Auto-generated catch block
+							logger.error("CSV parsing error: ", e);
 							e.printStackTrace();
 						}
 					}
