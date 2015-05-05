@@ -6,8 +6,13 @@ ems
 Please do not push to this repository. Just fork this repository and then add this as a remote upstream:
 
 ```
-$ git remote add upstream https://github.com/kashif/algo-big-data.git
+$ git remote add upstream https://github.com/kressnerd/ems.git
 ```
+for https or
+```
+$ git remote add upstream git@github.com:kressnerd/ems.git
+```
+for ssh. (debends on your auth)
 
 and then when needed just fetch and rebase:
 
