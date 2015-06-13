@@ -4,3 +4,12 @@
 *.jar
 *.war
 *.ear
+
+# IntelliJ IDEA
+.idea
+*.iml
+
+# Generated Folders
+eve/config
+eve/profiles
+eve/target
