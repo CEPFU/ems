@@ -13,3 +13,6 @@
 eve/config
 eve/profiles
 eve/target
+
+# Gradle
+.gradle
