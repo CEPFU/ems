@@ -10,9 +10,18 @@
 *.iml
 
 # Generated Folders
-eve/config
-eve/profiles
-eve/target
+config/
+profiles/
+target/
+sources/
 
 # Gradle
 .gradle
+
+# Eclipse
+
+.settings/
+
+.project
+
+.classpath
