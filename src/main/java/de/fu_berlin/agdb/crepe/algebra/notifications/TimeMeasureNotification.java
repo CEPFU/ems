@@ -20,7 +20,6 @@ public class TimeMeasureNotification implements Notification {
 	 */
 	@Override
 	public void apply() {
-		// TODO Auto-generated method stub
 		System.out.println("Benchmark end: " + System.currentTimeMillis());
 	}
 

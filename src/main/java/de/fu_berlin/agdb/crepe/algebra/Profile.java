@@ -68,8 +68,6 @@ public class Profile {
 				this.rule.reset();
 			}
 		} finally {
-
-			// windowing is checked regardless of match TODO: check
 			this.rule.applyWindow();
 		}
 	}
