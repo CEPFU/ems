@@ -63,9 +63,9 @@ public class ProfileLoader implements Processor {
 		File javaDirFile = new File(javaDir);
 		
 		if (!javaDirFile.exists()) {
-			javaDirFile.mkdir();
+			javaDirFile.mkdirs();
 		}
-		
+
 		File file = File.createTempFile("Profile", ".java",
 				javaDirFile);
 
