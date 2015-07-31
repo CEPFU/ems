@@ -3,33 +3,23 @@
  */
 package de.fu_berlin.agdb.crepe.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import de.fu_berlin.agdb.crepe.data.IEvent;
+import de.fu_berlin.agdb.crepe.inputadapters.IInputAdapter;
+import de.fu_berlin.agdb.crepe.loader.ILoader;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.fu_berlin.agdb.crepe.data.IEvent;
-import de.fu_berlin.agdb.crepe.inputadapters.IInputAdapter;
-import de.fu_berlin.agdb.crepe.loader.ILoader;
+import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLDecoder;
+import java.util.*;
 
 /**
  * Loads sources from XML text/files.
@@ -121,7 +111,8 @@ public class SourceParser implements Processor {
 			        return name.endsWith(".class");
 			    }
 			});
-			
+			if (files == null)
+				return classes;
 			// find classes that are implementing the interface and add them to the class list
 			for (File file : files) {
 			    String className = file.getName().replaceAll(".class$", "");
