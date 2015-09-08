@@ -1,25 +1,31 @@
-/**
- * 
- */
 package de.fu_berlin.agdb.crepe.core;
 
-import de.fu_berlin.agdb.crepe.data.IEvent;
-import de.fu_berlin.agdb.crepe.inputadapters.IInputAdapter;
-import de.fu_berlin.agdb.crepe.loader.ILoader;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.ProducerTemplate;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.commons.lang3.tuple.Triple;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import de.fu_berlin.agdb.crepe.algebra.Algebra;
+import de.fu_berlin.agdb.crepe.inputadapters.IInputAdapter;
+import de.fu_berlin.agdb.crepe.loader.ILoader;
 
 /**
  * Loads sources from XML text/files.
@@ -34,26 +40,25 @@ public class SourceParser implements Processor {
 	public static final String INPUT_ADAPTER_PREFIX = "inputAdapter";
 	
 	private static Logger logger = LogManager.getLogger();
+
+	SourceHandler loaderHandler;
 	
 	private URL loaderPath;
 	private URL inputAdapterPath;
 	
-	// Stores the declarations of the constructors of all loader and input adapter classes
-	// The map stores a list of constructor declarations for the class name (in the String).
-	// The second list contains all tags of a declaration.
 	private Map<String, List<List<String>>> loaderParameters;
 	private Map<String, List<List<String>>> inputAdapterParameters;
-	
-	private boolean benchmarking = false;
+	private boolean benchmarking;
 	
 	/**
 	 * Loads the source parser.
 	 */
 	public SourceParser() {
+		loaderHandler = createAndStartLoaderHandler();
 		
-		this.loaderPath = Thread.currentThread().getContextClassLoader().getResource(LOADER_PACKAGE.replace(".", "/"));
-		this.inputAdapterPath = Thread.currentThread().getContextClassLoader().getResource(INPUT_ADAPTER_PACKAGE.replace(".", "/"));
-		this.generateParameters();
+		loaderPath = Thread.currentThread().getContextClassLoader().getResource(LOADER_PACKAGE.replace(".", "/"));
+		inputAdapterPath = Thread.currentThread().getContextClassLoader().getResource(INPUT_ADAPTER_PACKAGE.replace(".", "/"));
+		generateParameters();
 	}
 	
 	/**
@@ -62,10 +67,90 @@ public class SourceParser implements Processor {
 	 * @param inputAdapterPath input adapter path
 	 */
 	public SourceParser(URL loaderPath, URL inputAdapterPath) {
+		loaderHandler = createAndStartLoaderHandler();
 		
 		this.loaderPath = loaderPath;
 		this.inputAdapterPath = inputAdapterPath;
 		this.generateParameters();
+	}
+	
+	private SourceHandler createAndStartLoaderHandler() {
+		loaderHandler = new SourceHandler(Algebra.EVENT_QUEUE_URI);
+		Thread loaderHandlerThread = new Thread(loaderHandler);
+		loaderHandlerThread.start();
+		return loaderHandler;
+	}
+
+	@Override
+	public void process(Exchange exchange) throws Exception {
+		logger.info("Source file loaded.");
+		if (this.benchmarking) {
+			// no logger is used because logging is turned off for benchmarking
+			System.out.println("Benchmark start: " + System.currentTimeMillis());
+		}
+
+		String body = exchange.getIn().getBody(String.class);
+		
+		Properties properties = new Properties();
+		properties.load(new ByteArrayInputStream(body.getBytes("UTF-8")));
+	
+		ILoader loader = parseLoader(properties);
+		if (loader == null){
+			logger.error("No matching loader declaration found! Not loading source.");
+			return;
+		}
+		
+		IInputAdapter inputAdapter = parseInputAdapter(properties);
+		if (inputAdapter == null){
+			logger.error("No matching input adapter declaration found! Not loading source.");
+			return;
+		}
+		
+		loaderHandler.addLoaderAndInputAdapter(Triple.of(loader, inputAdapter, exchange.getContext().createProducerTemplate()));
+	}
+
+	private ILoader parseLoader(Properties properties) {
+		String loader = properties.getProperty("loader");
+		logger.info("Loader specified in source file: " + loader);
+		List<List<String>> loaderParameters = this.loaderParameters.get(loader);
+		if (loaderParameters == null) {
+			logger.error("Loader specified in source file could not be found! Not loading source.");
+			return null;
+		}
+			
+		ILoader loaderObject = null;
+		
+		for (List<String> curParameters : loaderParameters) {
+			
+			// check if all parameters of the properties file match the parameters of the loader
+			if (curParameters.equals(this.getPropertiesWithPrefix(LOADER_PREFIX, properties))) {
+				
+				// now load class
+			    loaderObject = (ILoader) this.loadClass(LOADER_PACKAGE + "." + loader, curParameters, properties, LOADER_PREFIX);
+			    break; // only first possible match is used
+			}
+		}
+		return loaderObject;
+	}
+	
+	private IInputAdapter parseInputAdapter(Properties properties) {
+		IInputAdapter inputAdapterObject = null;
+		String inputAdapter = properties.getProperty(INPUT_ADAPTER_PREFIX);
+		List<List<String>> inputAdapterParameters = this.inputAdapterParameters.get(inputAdapter);
+		if (inputAdapterParameters == null) {
+			logger.error("Input adapter specified in source file could not be found! Not loading source.");
+			return null;
+		}
+		
+		for (List<String> curParameters : inputAdapterParameters) {
+			
+			if (equalsIgnoringOrder(curParameters, this.getPropertiesWithPrefix(INPUT_ADAPTER_PREFIX, properties))) {
+		
+				inputAdapterObject = (IInputAdapter) this.loadClass(INPUT_ADAPTER_PACKAGE + "." + inputAdapter, curParameters, properties, INPUT_ADAPTER_PREFIX);
+				break; // only first possible input adapter (shouldn't be more than one anyway)
+			}
+		}
+		return inputAdapterObject;
 	}
 	
 	/**
@@ -75,17 +160,17 @@ public class SourceParser implements Processor {
 
 		// first look for loaders in the loader package
 		this.loaderParameters = new Hashtable<String, List<List<String>>>();
-		List<Class<?>> loaders = this.findClasses(ILoader.class, loaderPath, LOADER_PACKAGE);
+		List<Class<?>> loaders = findClasses(ILoader.class, loaderPath, LOADER_PACKAGE);
 		for (Class<?> curLoader : loaders) {
-			this.loaderParameters.put(curLoader.getSimpleName(), this.classParameters(curLoader));
+			this.loaderParameters.put(curLoader.getSimpleName(), classParameters(curLoader));
 		}
 		logger.info("Found the following loader plugins: " + loaderParameters.keySet());
 		
 		// then for input adapters in the input adapter package
 		this.inputAdapterParameters = new Hashtable<String, List<List<String>>>();
-		List<Class<?>> inputAdapters = this.findClasses(IInputAdapter.class, inputAdapterPath, INPUT_ADAPTER_PACKAGE);
+		List<Class<?>> inputAdapters = findClasses(IInputAdapter.class, inputAdapterPath, INPUT_ADAPTER_PACKAGE);
 		for (Class<?> curInputAdapter : inputAdapters) {
-			this.inputAdapterParameters.put(curInputAdapter.getSimpleName(), this.classParameters(curInputAdapter));
+			this.inputAdapterParameters.put(curInputAdapter.getSimpleName(), classParameters(curInputAdapter));
 		}
 		logger.info("Found the following input adapter plugins: " + inputAdapterParameters.keySet());
 	}
@@ -111,8 +196,11 @@ public class SourceParser implements Processor {
 			        return name.endsWith(".class");
 			    }
 			});
-			if (files == null)
+			
+			if (files == null){
 				return classes;
+			}
+			
 			// find classes that are implementing the interface and add them to the class list
 			for (File file : files) {
 			    String className = file.getName().replaceAll(".class$", "");
@@ -136,7 +224,6 @@ public class SourceParser implements Processor {
 		
 		return classes;
 	}
-	
 	
 	/**
 	 * Generates a list of all parameters for every constructor of a class. Every list entry represents one
@@ -226,84 +313,6 @@ public class SourceParser implements Processor {
 	}
 	
 	/**
-	 * Parses source definition.
-	 * @param source source definition.
-	 */
-	public IInputAdapter parse(String source) {
-		
-		// all interests are "properties files"
-		Properties prop = new Properties();
-		try {
-			prop.load(new ByteArrayInputStream(source.getBytes("UTF-8")));
-
-			// first the loader
-			String loader = prop.getProperty("loader");
-			logger.info("Loader specified in source file: " + loader);
-			List<List<String>> loaderParameters = this.loaderParameters.get(loader);
-			if (loaderParameters == null) {
-				logger.error("Loader specified in source file could not be found! Not loading source.");
-				return null;
-			}
-				
-			ILoader loaderObject = null;
-			
-			for (List<String> curParameters : loaderParameters) {
-				
-				// check if all parameters of the properties file match the parameters of the loader
-				if (curParameters.equals(this.getPropertiesWithPrefix(LOADER_PREFIX, prop))) {
-					
-					// now load class
-				    loaderObject = (ILoader) this.loadClass(LOADER_PACKAGE + "." + loader, curParameters, prop, LOADER_PREFIX);
-				    break; // only first possible match is used
-				}
-			}
-
-			// when no loader was found there's no need for parsing the input adapter
-			if (loaderObject == null) {
-				logger.error("No matching loader declaration found! Not loading source.");
-				return null;
-			}
-			
-			// now the input adapter
-			IInputAdapter inputAdapterObject = null;
-			String inputAdapter = prop.getProperty(INPUT_ADAPTER_PREFIX);
-			List<List<String>> inputAdapterParameters = this.inputAdapterParameters.get(inputAdapter);
-			if (inputAdapterParameters == null) {
-				logger.error("Input adapter specified in source file could not be found! Not loading source.");
-				return null;
-			}
-			
-			for (List<String> curParameters : inputAdapterParameters) {
-				
-				if (equalsIgnoringOrder(curParameters, this.getPropertiesWithPrefix(INPUT_ADAPTER_PREFIX, prop))) {
-			
-					inputAdapterObject = (IInputAdapter) this.loadClass(INPUT_ADAPTER_PACKAGE + "." + inputAdapter, curParameters, prop, INPUT_ADAPTER_PREFIX);
-					break; // only first possible input adapter (shouldn't be more than one anyway)
-				}
-			}
-			
-			if (inputAdapterObject != null) {
-				logger.info("Loading source.");
-				loaderObject.load();
-				logger.info("Done.");
-				logger.info("Importing events.");
-				inputAdapterObject.load(loaderObject.getText());
-				logger.info("Done.");
-			}
-			
-			return inputAdapterObject;
-		} catch (UnsupportedEncodingException e) {
-			// shouldn't happen because all internal encoding is done in UTF-8
-			logger.error(e);
-		} catch (IOException e) {
-			logger.error(e);
-		}
-		
-		// should never happen. Only for compiling reasons.
-		return null;
-	}
-	
-	/**
 	 * Finds properties that start with a certain prefix separated by a "." and returns them in
 	 * a new list without the prefixes.
 	 * @param prefix prefix of property.
@@ -319,86 +328,7 @@ public class SourceParser implements Processor {
 				list.add(curString.substring(prefix.length() + 1)); // + 1 because of the dot
 			}
 		}
-		
 		return list;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.apache.camel.Processor#process(org.apache.camel.Exchange)
-	 */
-	@Override
-	public void process(Exchange exchange) throws Exception {
-		
-		logger.info("Source file loaded.");
-		
-		// first parse the message and find out loader and input adapter
-		IInputAdapter inputAdapter = this.parse(exchange.getIn().getBody(String.class));
-		if (inputAdapter == null)
-			return;
-		
-		// then send messages into the queue
-		ProducerTemplate template = exchange.getContext().createProducerTemplate();
-		for (IEvent curEvent : inputAdapter.getEvents()) {
-			template.sendBody("ems-jms:queue:main.queue", curEvent);
-		}
-	}
-	
-	/**
-	 * Method that actually loads the source. For use with the splitter pattern
-	 * of apache camel. 
-	 * @param body message body of source file
-	 * @return list of events that are loaded
-	 */
-	public List<IEvent> split(String body) {
-		
-		logger.info("Source file loaded.");
-		
-		// first parse the message and find out loader and input adapter
-		IInputAdapter inputAdapter = this.parse(body);
-		if (inputAdapter == null)
-			return null;
-		
-		if (this.benchmarking) {
-			// no logger is used because logging is turned off for benchmarking
-			System.out.println("Benchmark start: " + System.currentTimeMillis());
-		}
-		
-		return inputAdapter.getEvents();
-	}
-	
-	/**
-	 * @return the loaderPath
-	 */
-	public URL getLoaderPath() {
-		return loaderPath;
-	}
-
-	/**
-	 * @param loaderPath the loaderPath to set
-	 */
-	public void setLoaderPath(URL loaderPath) {
-		this.loaderPath = loaderPath;
-	}
-
-	/**
-	 * @return the inputAdapterPath
-	 */
-	public URL getInputAdapterPath() {
-		return inputAdapterPath;
-	}
-
-	/**
-	 * @param inputAdapterPath the inputAdapterPath to set
-	 */
-	public void setInputAdapterPath(URL inputAdapterPath) {
-		this.inputAdapterPath = inputAdapterPath;
-	}
-
-	/**
-	 * @param doBenchmark if true then time measuring is activated 
-	 */
-	public void setBenchmarking(boolean doBenchmark) {
-		this.benchmarking = true;
 	}
 	
 	/**
@@ -407,7 +337,7 @@ public class SourceParser implements Processor {
 	 * @param c2 second collection.
 	 * @return true if equal false otherwise.
 	 */
-	public static <T> boolean equalsIgnoringOrder(Collection<T> c1, Collection<T> c2) {
+	private <T> boolean equalsIgnoringOrder(Collection<T> c1, Collection<T> c2) {
 		
 		if (c1.size() != c2.size())
 			return false;
@@ -417,4 +347,9 @@ public class SourceParser implements Processor {
 		
 		return false;
 	}
+
+	public void setBenchmarking(boolean benchmarking) {
+		this.benchmarking = benchmarking;
+	}
+
 }

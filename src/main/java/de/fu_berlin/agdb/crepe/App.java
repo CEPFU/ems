@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import de.fu_berlin.agdb.crepe.algebra.Algebra;
 import de.fu_berlin.agdb.crepe.core.CommandLineParser;
 import de.fu_berlin.agdb.crepe.core.Configuration;
+import de.fu_berlin.agdb.crepe.core.SourceHandler;
 import de.fu_berlin.agdb.crepe.core.ProfileLoader;
 import de.fu_berlin.agdb.crepe.core.SourceParser;
 
@@ -74,7 +75,7 @@ public class App {
 				sourceParser.setBenchmarking(true);
 				System.out.println("Benchmarking activated."); // no logger is used because it usually is turned off for benchmarking
 			}
-
+			
 			// this route loads source files from disk and process them via the SourceParser
 			camelContext.addRoutes(new RouteBuilder() {
 				public void configure() {
@@ -85,9 +86,7 @@ public class App {
 										+ "&noop=true");
 						from(
 								"file://" + file.getParent() + "?fileName=" + file.getName()
-										+ "&noop=true").split()
-								.method(sourceParser, "split")
-								.to(Algebra.EVENT_QUEUE_URI);
+										+ "&noop=true").process(sourceParser);
 					}
 					else {
 						// source files are moved to "inprogress" during processing and to "done" after processing
@@ -95,9 +94,16 @@ public class App {
 								"file://"
 										+ mainConfiguration.getSourcesFolder()
 										+ "?preMove=inprogress/&move=../done/&moveFailed=failed/")
-								.split().method(sourceParser, "split")
-								.to(Algebra.EVENT_QUEUE_URI);
+								.process(sourceParser);
 					}
+				}
+			});
+			
+			// this route processes all events from the LoaderHandler queue (filled by the Loaders)
+			camelContext.addRoutes(new RouteBuilder() {
+				@Override
+				public void configure() throws Exception {
+					from(SourceHandler.LOADER_HANDLER_QUEUE_URI).to(Algebra.EVENT_QUEUE_URI);
 				}
 			});
 			
