@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.lang3.tuple.Triple;
 
 import de.fu_berlin.agdb.crepe.data.IEvent;
 import de.fu_berlin.agdb.crepe.inputadapters.IInputAdapter;

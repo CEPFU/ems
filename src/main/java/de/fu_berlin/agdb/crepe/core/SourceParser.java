@@ -19,7 +19,7 @@ import java.util.Properties;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.commons.lang3.tuple.Triple;
+import org.apache.camel.ProducerTemplate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +40,6 @@ public class SourceParser implements Processor {
 	public static final String INPUT_ADAPTER_PREFIX = "inputAdapter";
 	
 	private static Logger logger = LogManager.getLogger();
-
 	SourceHandler loaderHandler;
 	
 	private URL loaderPath;
@@ -106,7 +105,7 @@ public class SourceParser implements Processor {
 			return;
 		}
 		
-		loaderHandler.addLoaderAndInputAdapter(Triple.of(loader, inputAdapter, exchange.getContext().createProducerTemplate()));
+		loaderHandler.addLoaderAndInputAdapter(new Triple<ILoader, IInputAdapter, ProducerTemplate>(loader, inputAdapter, exchange.getContext().createProducerTemplate()));
 	}
 
 	private ILoader parseLoader(Properties properties) {
