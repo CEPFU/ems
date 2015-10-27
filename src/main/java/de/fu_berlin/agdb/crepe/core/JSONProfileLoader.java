@@ -22,6 +22,7 @@ public class JSONProfileLoader extends ProfileLoader {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Algebra algebra;
     private String profilesFolder;
+    private boolean isJSON = true;
 
     /**
      * Loads profiles from profile files into an algebra.
@@ -39,9 +40,10 @@ public class JSONProfileLoader extends ProfileLoader {
         String filename = exchange.getIn().getHeader("camelfilename", String.class);
         if (filename == null)
             return;
-
+        System.out.println("Found file: " + filename);
         if (filename.endsWith(".json")) {
-            logger.info("Loading profile from: " + filename);
+            isJSON = true;
+            logger.info("Loading JSON profile from: " + filename);
             try {
                 List<Profile> profiles = this.load(exchange.getIn().getBody(String.class));
                 for (Profile profile : profiles) {
@@ -53,12 +55,17 @@ public class JSONProfileLoader extends ProfileLoader {
                 logger.error("Profile could not be loaded!", ex);
             }
         } else {
+            isJSON = false;
             super.process(exchange);
         }
     }
 
     public List<Profile> load(String definition) throws IOException {
-        JSONProfile jsonProfile = objectMapper.readValue(definition, JSONProfile.class);
-        return Collections.singletonList(jsonProfile.getProfile(new EndlessWindow()));
+        if (isJSON) {
+            JSONProfile jsonProfile = objectMapper.readValue(definition, JSONProfile.class);
+            return Collections.singletonList(jsonProfile.getProfile(new EndlessWindow()));
+        } else {
+            return super.load(definition);
+        }
     }
 }
