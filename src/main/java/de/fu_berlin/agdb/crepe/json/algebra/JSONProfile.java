@@ -30,7 +30,7 @@ public class JSONProfile extends JSONAlgebraElement<Profile> {
     }
 
     @JsonIgnore
-    private Profile getProfile(IWindow window) {
+    public Profile getProfile(IWindow window) {
         Operator ruleAlgebraElement = rule.getAlgebraElement();
 
         // Currently gives us an error with errorprone
