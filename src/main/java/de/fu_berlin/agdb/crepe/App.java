@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.jms.ConnectionFactory;
 
+import de.fu_berlin.agdb.crepe.core.*;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
@@ -14,11 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.fu_berlin.agdb.crepe.algebra.Algebra;
-import de.fu_berlin.agdb.crepe.core.CommandLineParser;
-import de.fu_berlin.agdb.crepe.core.Configuration;
-import de.fu_berlin.agdb.crepe.core.SourceHandler;
-import de.fu_berlin.agdb.crepe.core.ProfileLoader;
-import de.fu_berlin.agdb.crepe.core.SourceParser;
 
 /**
  * Main routine of backend.
@@ -59,7 +55,7 @@ public class App {
 			
 			final Algebra algebra = new Algebra(camelContext);
 			
-			final ProfileLoader profileLoader = new ProfileLoader(algebra, mainConfiguration.getProfilesFolder());
+			final ProfileLoader profileLoader = new JSONProfileLoader(algebra, mainConfiguration.getProfilesFolder());
 			
 			final SourceParser sourceParser; 
 			if (mainConfiguration.getLoaderPath() != null && mainConfiguration.getInputAdapterPath() != null) {
