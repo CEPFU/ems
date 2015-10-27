@@ -60,7 +60,7 @@ public class Algebra implements Processor {
 		
 		IEvent event = exchange.getIn().getBody(IEvent.class);
 		
-		logger.debug("Processing event:\n" + event);
+		//logger.debug("Processing event:\n" + event);
 		
 		// process all profiles
 		for (Profile curProfile : this.profiles) {
