@@ -15,6 +15,41 @@
     <name>Crepe</name>
     <description>Complex rule-based event processing engine</description>
 
+    <properties>
+        <app.mainClass>de.fu_berlin.agdb.crepe.App</app.mainClass>
+    </properties>
+
+    <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.1</version>
+        <configuration>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <manifestEntries>
+                <Main-Class>${app.mainClass}</Main-Class>
+                <X-Compile-Source-JDK>${java.version}</X-Compile-Source-JDK>
+                <X-Compile-Target-JDK>${java.version}</X-Compile-Target-JDK>
+                <Class-Path>${java.home}/../lib/tools.jar</Class-Path>
+              </manifestEntries>
+            </transformer>
+          </transformers>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+
     <dependencies>
         <dependency>
             <groupId>com.sun</groupId>
