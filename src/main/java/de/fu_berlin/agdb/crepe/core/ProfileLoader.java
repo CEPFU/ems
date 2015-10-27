@@ -175,11 +175,11 @@ public class ProfileLoader implements Processor {
 		}
 		catch (CompilerError e1) {
 			
-			logger.error("Profile file compilation error!");
+			logger.error("Profile file compilation error!", e1);
 		}
 		catch (IOException e2) {
 			
-			logger.error("Profile file could not be read.");
+			logger.error("Profile file could not be read.", e2);
 		}
 	}
 }
