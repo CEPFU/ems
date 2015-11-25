@@ -3,6 +3,7 @@ package de.fu_berlin.agdb.crepe.core;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -12,6 +13,7 @@ import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +56,29 @@ public class SourceParser implements Processor {
 	 */
 	public SourceParser() {
 		loaderHandler = createAndStartLoaderHandler();
+		try {
+			Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(LOADER_PACKAGE.replace(".", "/"));
+			while (resources.hasMoreElements() && loaderPath != null) {
+				URL url = (URL) resources.nextElement();
+				if(!url.toString().contains("/test-classes/")){
+					loaderPath = url;
+				}
+			}
+		} catch (IOException e) {
+			logger.error("Loader path could not be identified: ", e);;
+		}
 		
-		loaderPath = Thread.currentThread().getContextClassLoader().getResource(LOADER_PACKAGE.replace(".", "/"));
-		inputAdapterPath = Thread.currentThread().getContextClassLoader().getResource(INPUT_ADAPTER_PACKAGE.replace(".", "/"));
+		try {
+			Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(INPUT_ADAPTER_PACKAGE.replace(".", "/"));
+			while (resources.hasMoreElements() && inputAdapterPath != null) {
+				URL url = (URL) resources.nextElement();
+				if(!url.toString().contains("/test-classes/")){
+					inputAdapterPath = url;
+				}
+			}
+		} catch (IOException e) {
+			logger.error("InputAdapter path could not be identified: ", e);;
+		}
 		generateParameters();
 	}
 	
