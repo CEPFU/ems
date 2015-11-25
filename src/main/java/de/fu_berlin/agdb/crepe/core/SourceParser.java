@@ -58,7 +58,7 @@ public class SourceParser implements Processor {
 		loaderHandler = createAndStartLoaderHandler();
 		try {
 			Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(LOADER_PACKAGE.replace(".", "/"));
-			while (resources.hasMoreElements() && loaderPath != null) {
+			while (resources.hasMoreElements() && loaderPath == null) {
 				URL url = (URL) resources.nextElement();
 				if(!url.toString().contains("/test-classes/")){
 					loaderPath = url;
@@ -70,7 +70,7 @@ public class SourceParser implements Processor {
 		
 		try {
 			Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(INPUT_ADAPTER_PACKAGE.replace(".", "/"));
-			while (resources.hasMoreElements() && inputAdapterPath != null) {
+			while (resources.hasMoreElements() && inputAdapterPath == null) {
 				URL url = (URL) resources.nextElement();
 				if(!url.toString().contains("/test-classes/")){
 					inputAdapterPath = url;
