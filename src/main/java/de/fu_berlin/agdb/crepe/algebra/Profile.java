@@ -53,7 +53,7 @@ public class Profile {
 		try {
 			if (this.rule.apply(event)) {
 
-				logger.info("Matching events: " + this.rule.matchToString());
+				logger.debug("Matching events: " + this.rule.matchToString());
 
 				// throw notifications
 				for (Notification curNotification : notifications) {
