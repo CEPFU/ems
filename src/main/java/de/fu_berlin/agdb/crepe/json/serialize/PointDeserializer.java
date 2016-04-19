@@ -23,14 +23,14 @@ public class PointDeserializer extends JsonDeserializer<Point> {
     /**
      * SRID 4326
      */
-    private static final int SRID = 4326;
-    private static final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
+    public static final int SRID = 4326;
+    public static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(), SRID);
 
     @Override
     public Point deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         try {
             SimplePoint jsonPoint = jp.readValueAs(SimplePoint.class);
-            return geometryFactory.createPoint(
+            return GEOMETRY_FACTORY.createPoint(
                     new Coordinate(jsonPoint.getLatitude(), jsonPoint.getLongitude())
             );
         } catch (Exception e) {

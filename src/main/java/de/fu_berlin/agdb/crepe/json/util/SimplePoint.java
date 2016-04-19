@@ -3,6 +3,7 @@ package de.fu_berlin.agdb.crepe.json.util;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import de.fu_berlin.agdb.crepe.json.serialize.PointDeserializer;
 
 /**
  * Simple latitude/longitude point
@@ -41,6 +42,6 @@ public class SimplePoint {
     }
 
     public Point asGeometryPoint() {
-        return asGeometryPoint(new GeometryFactory());
+        return asGeometryPoint(PointDeserializer.GEOMETRY_FACTORY);
     }
 }
