@@ -10,6 +10,7 @@ import static org.junit.Assert.*;
 public class IonicPushNotificationTest {
 
     @Test
+    @Ignore // ionic backend domain does not exist anymore
     public void testApply() throws Exception {
         IonicPushNotification notification = new IonicPushNotification(
                 "0dec6bd8-6611-4213-9a18-7ce0ae11fa61",
