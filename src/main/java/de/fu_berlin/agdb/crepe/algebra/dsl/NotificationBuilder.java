@@ -4,12 +4,7 @@
 package de.fu_berlin.agdb.crepe.algebra.dsl;
 
 import de.fu_berlin.agdb.crepe.algebra.Match;
-import de.fu_berlin.agdb.crepe.algebra.notifications.BlankNotification;
-import de.fu_berlin.agdb.crepe.algebra.notifications.CompositeEventNotification;
-import de.fu_berlin.agdb.crepe.algebra.notifications.Notification;
-import de.fu_berlin.agdb.crepe.algebra.notifications.TimeMeasureNotification;
-import de.fu_berlin.agdb.crepe.algebra.notifications.VerboseNotification;
-import de.fu_berlin.agdb.crepe.algebra.notifications.WriterNotification;
+import de.fu_berlin.agdb.crepe.algebra.notifications.*;
 import de.fu_berlin.agdb.crepe.data.Event;
 import de.fu_berlin.agdb.crepe.data.IEvent;
 import de.fu_berlin.agdb.crepe.outputadapters.IOutputAdapter;
@@ -96,5 +91,17 @@ public class NotificationBuilder {
 	public static Notification timeMeasureNotification() {
 		
 		return new TimeMeasureNotification();
+	}
+
+	/**
+	 * Creates a notification that is being pushed to a user's Android device.
+	 *
+	 * @param message message that is shown
+	 * @param firebaseToken the firebase token needed to push the message
+	 * @param profilePrimaryKey
+     * @return
+     */
+	public static AndroidPushNotification androidPushNotification(String message, String firebaseToken, long profilePrimaryKey) {
+		return new AndroidPushNotification(message, firebaseToken, profilePrimaryKey);
 	}
 }
